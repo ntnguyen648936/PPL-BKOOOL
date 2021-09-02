@@ -1,3 +1,7 @@
+# Project ignore
+solutions/
+testcases/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
