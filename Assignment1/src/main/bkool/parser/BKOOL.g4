@@ -8,28 +8,30 @@ options{
 	language=Python3;
 }
 
-program  : decl+ EOF ;
+program  : ;// classDecl+ EOF ;
+/*
+classDecl: CLASS ID classDeclExtension LB classBody RB;
 
-decl: vardecl | funcdecl;
+classDeclExtension: EXTEND ID | ;
 
-vardecl: TYPE listVardecl SIMI;
+classBody: members*; // nullable list of members 
 
-funcdecl: TYPE ID LP funcDeclParams RP body;
+members: attrDecl | methodDecl;
 
-funcDeclParams: TYPE listVardecl listFuncDeclParams | ;
+attrDecl: STATIC? FINAL? TYPE listAttrDecl SIMI; // 
+methodDecl: STATIC (returnMethodDecl | voidMethodDecl);
+returnMethodDecl: TYPE ID LP paramDecl RP returnBody;
+voidMethodDecl: VOID ID LP paramDecl RP noReturnBody;
 
-listFuncDeclParams: SIMI TYPE listVardecl listFuncDeclParams |;
-listVardecl: ID COMMA listVardecl | ID;
+paramDecl: TYPE listAttrDecl listParamDecl | ;
 
+listParamDecl: SIMI TYPE listAttrDecl listParamDecl |;
+listAttrDecl: ID declAssignment COMMA listAttrDecl | ID;
 
-TYPE: 'int' | 'float';
-FINAL: 'final';
-STATIC: 'static';
+declAssignment: EQUATION expr | ;
 
-FLOATLIT: INTLIT DOT INTLIT;
-INTLIT: [1-9][0-9]* | [0];
-
-body: LB listStmt retStmt RB;
+returnBody: LB listStmt retStmt RB;
+noReturnBody: LB listStmt RB;
 
 listStmt: stmt listStmt | ;
 funcCall: ID LP funcCallParams RP; 
@@ -42,32 +44,109 @@ assignment: ID ASSIGN expr SIMI;
 
 funcCallStmt: funcCall SIMI; 
 
-retStmt: 'return' expr SIMI;
+retStmt: RETURN expr SIMI;
 
 funcCallParams: expr listFuncCallParams | ;
 listFuncCallParams: COMMA expr listFuncCallParams | ;
+stmt: attrDecl | assignment | funcCallStmt;
+*/
+
+//literal: intLit | stringLit | floatLit | boolLit | arrayLit;
+
+FLOATLIT: DIGIT+ (DECIMAL | EXPONENT | DECIMAL EXPONENT);
+fragment DECIMAL: DOT DIGIT*; // ditgit after decimal point is optinal
+fragment EXPONENT: [Ee] ('+'|'-')? DIGIT+;
+INTLIT: DIGIT+;
+fragment DIGIT: [0-9];
+
+STRING_LIT: '"' STR_CHAR* '"';
+
+TYPE: 'int' | 'float' | 'boolean' | 'string';
+CLASS: 'class';
+FINAL: 'final';
+STATIC: 'static';
+EXTEND: 'extends';
+VOID: 'void';
+MAIN: 'main';
+NEW: 'new';
+RETURN: 'return';
+TRUE: 'true';
+FALSE: 'false';
+FOR: 'for';
+THEN: 'then';
+NIL: 'nil';
+IF: 'if';
+DOWNTO: 'downto';
+TO: 'to';
+BREAK: 'break';
+ELSE: 'else';
+CONTINUE: 'continue';
+THIS: 'this';
 
 
-stmt: vardecl | assignment | funcCallStmt;
-
-ID: [a-zA-Z]+;
 
 COMMA: ',';
-DOT: '.';
 SIMI: ';';
 LP: '(';
 RP: ')';
 LB: '{';
 RB: '}';
+LSB: '[';
+RSB: ']';
+EQUATION: '=';
 ADD: '+';
 SUB: '-';
 MUL: '*';
-DIV: '/';
-ASSIGN: '=';
+INT_DIV: '/';
+FLOAT_DIV: '\\';
+ASSIGN: ':=';
+LOWER_E: '<=';
+GREATER_E: '>=';
+NOT_EQUALS: '!=';
+EQUALS : '==' ;
+LOWER : '<' ;
+GREATER : '>' ;
+PERCENT: '%';
+DOT: '.';
+AND: '&&';
+NOT: '!';
+OR: '||';
+CONCAT: '^';
 
-WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
+ID: [_a-zA-Z][_a-zA-Z0-9]*;
+
+// Skip comments
+BLOCK_COMMENT: '/*' .*? '*/' -> skip ;
+LINE_COMMENT : '#' ~[\r\n]* ([\r\n]|EOF) -> skip ;
 
 
-ERROR_CHAR: . {raise ErrorToken(self.text)};
-//UNCLOSE_STRING: .;
-//ILLEGAL_ESCAPE: .;
+WS : [ \t\r\n\f]+ -> skip ; // skip spaces, tabs, newlines
+
+
+UNCLOSE_STRING: '"' STR_CHAR* 
+	{
+		y = str(self.text)
+		possible = ['\b', '\t', '\n', '\f', '\r', '"', "'", '\\']
+		if y[-1] in possible:
+			raise UncloseString(y[1:-1])
+		else:
+			raise UncloseString(y[1:])
+	}
+	;
+ILLEGAL_ESCAPE: '"' STR_CHAR* ESC_ILLEGAL
+	{
+		y = str(self.text)
+		raise IllegalEscape(y[1:])
+	}
+	;
+fragment STR_CHAR: ~[\b\t\n\f\r"\\] | ESC_SEQ ;
+
+fragment ESC_SEQ: '\\' ([btnfr"\\] | '\'') ;
+
+fragment ESC_ILLEGAL: '\\' (~[btnfr"\\] | ~'\\') ;
+
+ERROR_CHAR: .
+	{
+		raise ErrorToken(self.text)
+	}
+	;
