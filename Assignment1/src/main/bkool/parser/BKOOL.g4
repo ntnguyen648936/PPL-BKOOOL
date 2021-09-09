@@ -8,94 +8,349 @@ options{
 	language=Python3;
 }
 
-program  : ;// classDecl+ EOF ;
+program  : classDecl+ EOF ;
+
+// CLASS DECLAR
+
+classDecl
+	: CLASS ID classDeclExtension? LCB classBody RCB
+	;
+
+classDeclExtension
+	: EXTENDS ID
+	;
+
+classBody
+	: members*
+	; // nullable list of members 
+
+members
+	: attrDecl 
+	| methodDecl
+	;
+
+// ATTRIBUTE MEMBER
+
+attrDecl
+	: attrPreDecl? varDeclStmt
+	; 
+
+attrPreDecl
+	: STATIC FINAL? 
+	| FINAL? STATIC
+	;
+
+oneAttr
+	: ID declAssignment?
+	;
+
+listAttr
+	: COMMA oneAttr listAttr 
+	| 
+	;
+
+declAssignment
+	: EQUATION expr
+	| EQUATION arrayLit
+	;
+
+// METHOD MEMBER
+
+methodDecl
+	: preMethodDecl ID LP paramDecl? RP blockStmt
+	| ID LP paramDecl? RP blockStmt
+	; 
+
+preMethodDecl
+	: langTYPE
+	| VOID
+	| STATIC langTYPE
+	| STATIC VOID
+	;
+
+paramDecl
+	: langTYPE oneAttr listAttr listParamDecl
+	;
+
+listParamDecl
+	: SIMI langTYPE oneAttr listAttr listParamDecl |
+	;
+
+
+// STATEMENT
+
+blockStmt
+	: LCB singleStmt* RCB
+	;
+
+varDeclStmt
+	: FINAL? langTYPE oneAttr listAttr SIMI
+	;
+
+assignStmt
+	: lhs ASSIGN expr SIMI
+	;
+
+lhs
+	: scalarVar
+	| term_IndexExpr
+	;
+
+scalarVar
+	: term_MemAccess DOT ID
+	| ID
+	;
+
+
+singleStmt
+	: IF expr THEN statement ELSE statement
+	| IF expr THEN statement
+	| otherStmt
+	;
 /*
-classDecl: CLASS ID classDeclExtension LB classBody RB;
+singleStmt
+	: matchStmt
+	| unmatchStmt
+	;
 
-classDeclExtension: EXTEND ID | ;
+matchStmt
+	: IF expr THEN matchStmt ELSE matchStmt
+	| otherStmt
+	;
 
-classBody: members*; // nullable list of members 
+unmatchStmt
+	: IF expr THEN statement
+	| IF expr THEN matchStmt ELSE unmatchStmt
+	;
 
-members: attrDecl | methodDecl;
+otherStmt
+	: forStmt
+	| attrDecl 
+	| assignStmt 
+	| funcCallStmt
+	| retStmt
+	;
+*/
+forStmt
+	: FOR scalarVar ASSIGN expr TO_DOWNTO expr DO statement
+	;
 
-attrDecl: STATIC? FINAL? TYPE listAttrDecl SIMI; // 
-methodDecl: STATIC (returnMethodDecl | voidMethodDecl);
-returnMethodDecl: TYPE ID LP paramDecl RP returnBody;
-voidMethodDecl: VOID ID LP paramDecl RP noReturnBody;
+// Method invocation
+funcCallStmt
+	: funcCallExpr SIMI
+	| term_MemAccess DOT funcCallExpr SIMI
+	; 
 
-paramDecl: TYPE listAttrDecl listParamDecl | ;
+retStmt
+	: RETURN expr SIMI
+	;
 
-listParamDecl: SIMI TYPE listAttrDecl listParamDecl |;
-listAttrDecl: ID declAssignment COMMA listAttrDecl | ID;
+continueStmt
+	: CONTINUE SIMI
+	;
 
-declAssignment: EQUATION expr | ;
+breakStmt
+	: BREAK SIMI
+	;
 
-returnBody: LB listStmt retStmt RB;
-noReturnBody: LB listStmt RB;
+statement
+	: blockStmt
+	| singleStmt
+	;
 
-listStmt: stmt listStmt | ;
-funcCall: ID LP funcCallParams RP; 
+otherStmt
+	: forStmt
+	| varDeclStmt 
+	| assignStmt 
+	| funcCallStmt
+	| breakStmt
+	| continueStmt
+	| retStmt
+	;
 
-expr: expr DIV term | expr MUL term | term;
-term: factor ADD term | factor SUB factor | factor;
-factor: LP expr RP | INTLIT | FLOATLIT | funcCall | ID;
+// EXPRESSION
 
-assignment: ID ASSIGN expr SIMI;
+expr
+	: term_0 (LOWER | GREATER | LOWER_E | GREATER_E) term_0
+	| term_0
+	; // < > <= >=
 
-funcCallStmt: funcCall SIMI; 
+term_0
+	: term_1 (EQUALS | NOT_EQUALS) term_1
+	| term_1
+	; // == !=
 
-retStmt: RETURN expr SIMI;
+term_1
+	: term_1 (AND | OR) term_2
+	| term_2
+	; // && || @left
+	
+term_2
+	: term_2 (PLUS | MINUS) term_3
+	| term_3
+	; // + - (binary) @left
 
-funcCallParams: expr listFuncCallParams | ;
-listFuncCallParams: COMMA expr listFuncCallParams | ;
-stmt: attrDecl | assignment | funcCallStmt;
+term_3
+	: term_3 (MUL | INT_DIV | FLOAT_DIV | PERCENT) term_4
+	| term_4
+	; //  * / \ & @left
+
+term_4
+	: term_4 CONCAT term_5
+	| term_5
+	; // ^ (concat string) @left
+
+term_5
+	: NOT term_5
+	| term_6
+	; // ! (not) @right
+
+term_6
+	: (PLUS | MINUS) term_6
+	| term_IndexExpr
+	; // + - (unary) @right
+
+term_IndexExpr
+	: term_MemAccess LSB expr RSB
+	| term_MemAccess
+	; // INDEX expr
+
+term_MemAccess
+	: term_MemAccess DOT (ID | funcCallExpr)
+	| term_ObjCreation
+	; // Member access @left
+
+term_ObjCreation
+	: NEW ID LP listExpr? RP
+	| operands
+	; // Object Creation @right
+	
+operands
+	: LP expr RP
+	| INT_LIT 
+	| FLOATLIT 
+	| BOOL_LIT
+	| STRING_LIT
+	| NIL
+	| funcCallExpr
+	| ID
+	;
+
+funcCallExpr
+	: ID LP listExpr? RP
+	; 
+
+listExpr
+	: expr nextExpr
+	;
+
+nextExpr
+	: COMMA expr nextExpr 
+	|
+	;
+
+// Literals
+/*
+intArray: LCB INT_LIT listIntLit RCB;
+listIntLit: COMMA INT_LIT listIntLit |;
+
+floatArray: LCB FLOAT_LIT listFloatLit RCB;
+listFloatLit: COMMA FLOAT_LIT listFloatLit |;
+
+stringArray: LCB STRING_LIT listStringLit RCB;
+listStringLit: COMMA STRING_LIT listStringLit | ;
+
+boolArray: LCB BOOLEAN_LIT listBoolLit RCB;
+listBoolLit: COMMA BOOLEAN_LIT listBoolLit |;
+
+arrayLit
+	: intArray
+	| floatArray
+	| stringArray
+	| boolArray
+	;
 */
 
-//literal: intLit | stringLit | floatLit | boolLit | arrayLit;
+arrayLit
+	: LCB primLit listOfPrimLit RCB
+	;
+	
+listOfPrimLit
+	: COMMA primLit listOfPrimLit 
+	|
+	; 
+
+primLit	
+	: INT_LIT 
+	| STRING_LIT 
+	| FLOATLIT 
+	| BOOL_LIT 
+	;
+
+literal
+	: primLit
+	| arrayLit
+	;
+
+arrayType: 
+	PRIMITIVE LSB INT_LIT RSB
+	;
+
+langTYPE
+	: PRIMITIVE
+	| arrayType
+	| ID
+	;
+
+// ----------- TOKENS ---------------------------------------------
 
 FLOATLIT: DIGIT+ (DECIMAL | EXPONENT | DECIMAL EXPONENT);
 fragment DECIMAL: DOT DIGIT*; // ditgit after decimal point is optinal
 fragment EXPONENT: [Ee] ('+'|'-')? DIGIT+;
-INTLIT: DIGIT+;
+
+INT_LIT: DIGIT+;
 fragment DIGIT: [0-9];
 
 STRING_LIT: '"' STR_CHAR* '"';
+BOOL_LIT: 'true' | 'false';
 
-TYPE: 'int' | 'float' | 'boolean' | 'string';
+PRIMITIVE
+	: 'int' 
+	| 'float' 
+	| 'boolean' 
+	| 'string'
+	;
+
+VOID: 'void';
 CLASS: 'class';
 FINAL: 'final';
 STATIC: 'static';
-EXTEND: 'extends';
-VOID: 'void';
-MAIN: 'main';
+EXTENDS: 'extends';
+//MAIN: 'main';
 NEW: 'new';
 RETURN: 'return';
-TRUE: 'true';
-FALSE: 'false';
 FOR: 'for';
 THEN: 'then';
 NIL: 'nil';
 IF: 'if';
-DOWNTO: 'downto';
-TO: 'to';
+TO_DOWNTO: 'to' | 'downto';
+DO: 'do';
 BREAK: 'break';
 ELSE: 'else';
 CONTINUE: 'continue';
-THIS: 'this';
-
-
+//THIS: 'this';
 
 COMMA: ',';
 SIMI: ';';
 LP: '(';
 RP: ')';
-LB: '{';
-RB: '}';
+LCB: '{';
+RCB: '}';
 LSB: '[';
 RSB: ']';
 EQUATION: '=';
-ADD: '+';
-SUB: '-';
+PLUS: '+';
+MINUS: '-';
 MUL: '*';
 INT_DIV: '/';
 FLOAT_DIV: '\\';
