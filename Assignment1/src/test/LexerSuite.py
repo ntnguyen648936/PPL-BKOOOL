@@ -42,8 +42,11 @@ class LexerSuite(unittest.TestCase):
     def test_identifier_04(self):
         self.assertTrue(TestLexer.test("12abc","12,abc,<EOF>",134))    
 
-    def test_identifier_04(self):
-        self.assertTrue(TestLexer.test("12_Abc","12,_Abc,<EOF>",134))    
+    def test_identifier_05(self):
+        self.assertTrue(TestLexer.test("12_Abc","12,_Abc,<EOF>",135))    
+
+    def test_identifier_06(self):
+        self.assertTrue(TestLexer.test("abc 1A2","abc,1,A2,<EOF>",136))    
 
     # ---------------------------------------------------------------------------------------------------------
 
