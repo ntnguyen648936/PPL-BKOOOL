@@ -1,6 +1,13 @@
 # Project ignore
 solutions/
 testcases/
+parser/*.interp
+parser/*.tokens
+parser/BKOOL*.py
+
+target/*.interp
+target/*.tokens
+target/BKOOL*.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
