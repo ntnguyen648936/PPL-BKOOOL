@@ -1039,17 +1039,20 @@ class abc {
 r"""
 class ABC extends XYZ { 
     static int foo() {
-        #start of declaration part
+
         float r,s;
-        int[5] a,b;
-        #list of statements
+
         r:=2.0;
+
+        int[5] a,b;
+
         s:=r*r*this.myPI;
+
         a[0]:= s;
     }
 }
 """
-        expect = "successful"
+        expect = "Error on line 9 col 8: int"
         self.assertTrue(TestParser.test(input,expect,279))
 
     def test_statement_30(self):
@@ -1187,6 +1190,43 @@ class Shape {
     }
 
     static int getNumOfShape() {
+        return numOfShape;
+    }
+}
+class Rectangle extends Shape {
+    float getArea(){
+        return this.length;
+    }
+}
+
+class Angel extends Shape {
+
+}
+
+class Main {
+
+    void main(){
+        Shape s = Shape();
+    }
+}
+
+"""
+        expect = "successful"
+        self.assertTrue(TestParser.test(input,expect,286))
+
+    def test_complex_program_07(self):
+        input = \
+r"""
+class Shape {
+    static final int numOfShape = 0;
+    final int immuAttribute = 0;
+    float length,width;
+    
+    Shape() {
+
+    }
+
+    static int getNumOfShape() {
         numOfShape;
     }
 }
@@ -1209,7 +1249,82 @@ class Main {
 
 """
         expect = "Error on line 12 col 18: ;"
-        self.assertTrue(TestParser.test(input,expect,286))
+        self.assertTrue(TestParser.test(input,expect,287))
+
+    def test_complex_program_08(self):
+        input = \
+r"""
+class Shape {
+    static final int numOfShape = 0;
+    final int immuAttribute = 0;
+    float length,width;
+    
+    Shape() {
+
+    }
+
+    static int getNumOfShape() {
+        return numOfShape;
+    }
+}
+class Rectangle extends Shape {
+    float getArea(){
+        return this.length;
+    }
+}
+
+class Angel extends Shape {
+
+}
+
+class Main {
+
+    void main()
+        Shape s = Shape();
+    }
+}
+
+"""
+        expect = "Error on line 28 col 8: Shape"
+        self.assertTrue(TestParser.test(input,expect,288))
+
+    def test_complex_program_08(self):
+        input = \
+r"""
+class Shape {
+    static final int numOfShape = 0;
+    final int immuAttribute = 0;
+    float length,width;
+    
+    Shape() {
+
+    }
+
+    static int getNumOfShape() {
+        return numOfShape;
+    }
+}
+class Rectangle extends Shape {
+    float getArea(){
+        return this.length;
+    }
+}
+
+class Angel extends Shape {
+
+}
+
+class Main {
+
+    void main()
+        Shape s = Shape();
+    }
+}
+
+"""
+        expect = "Error on line 28 col 8: Shape"
+        self.assertTrue(TestParser.test(input,expect,288))
+
 
     # ---------------------------------------------------------------------------------------------------------
 

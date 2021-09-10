@@ -5,19 +5,19 @@ class LexerSuite(unittest.TestCase):
     # ---------------------------------------------------------------------------------------------------------
     
     def test_stringLit_01(self):
-        self.assertTrue(TestLexer.test("""\"What are you doing?\"""","\"What are you doing?\",<EOF>",101))
+        self.assertTrue(TestLexer.test("""\"What are you doing?\"""","What are you doing?,<EOF>",101))
 
     def test_stringLit_02(self):
             self.assertTrue(TestLexer.test("""\"What \\x are you doing?\"""","Illegal escape in string: What \\x",102))
 
     def test_stringLit_03(self):
-        self.assertTrue(TestLexer.test("""\"What \\n \\r \\t are you doing?\"""","\"What \\n \\r \\t are you doing?\",<EOF>",103))
+        self.assertTrue(TestLexer.test("""\"What \\n \\r \\t are you doing?\"""","What \\n \\r \\t are you doing?,<EOF>",103))
 
     def test_stringLit_04(self):
         self.assertTrue(TestLexer.test("""\"What are you doing?""","Unclosed String: What are you doing?",104))
 
     def test_stringLit_05(self):
-        self.assertTrue(TestLexer.test("""\"Say: \\"What are you doing?\\" \"""","""\"Say: \\"What are you doing?\\" \",<EOF>""",105))
+        self.assertTrue(TestLexer.test("""\"Say: \\"What are you doing?\\" \"""","""Say: \\"What are you doing?\\" ,<EOF>""",105))
 
     def test_stringLit_06(self):
         self.assertTrue(TestLexer.test("""\"What \n are you doing?\"""","Unclosed String: What ",106))
@@ -155,3 +155,15 @@ comment */
 
     def test_expression_02(self):
         self.assertTrue(TestLexer.test("_a:=1.2\\5e-1","_a,:=,1.2,\\,5e-1,<EOF>",152))
+
+    def test_187(self):
+        self.assertTrue(TestLexer.test("\"abc\r\"","Unclosed String: abc",199))
+
+    def test_155(self):
+        self.assertTrue(
+            TestLexer.test(
+                "\" abc \t \f \b abc \\f abc \"",
+                " abc \t \f \b abc \\f abc ,<EOF>",
+                198
+            )
+        )

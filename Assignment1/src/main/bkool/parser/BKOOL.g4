@@ -1,3 +1,8 @@
+/*
+** - Author: Nguyen Thanh Quoc Minh
+** - ID: 1752349
+*/
+
 grammar BKOOL;
 
 @lexer::header {
@@ -10,10 +15,11 @@ options{
 
 program  : classDecl+ EOF ;
 
-// CLASS DECLAR
+// CLASS DECLARE
 
 classDecl
-	: CLASS ID classDeclExtension? LCB classBody RCB
+	: CLASS ID LCB classBody RCB
+	| CLASS ID classDeclExtension LCB classBody RCB
 	;
 
 classDeclExtension
@@ -21,7 +27,8 @@ classDeclExtension
 	;
 
 classBody
-	: members*
+	: members classBody
+	|
 	; // nullable list of members 
 
 members
@@ -32,16 +39,24 @@ members
 // ATTRIBUTE MEMBER
 
 attrDecl
-	: attrPreDecl? varDeclStmt
+	: varDecl SIMI
+	| attrPreDecl varDecl SIMI
 	; 
 
 attrPreDecl
-	: STATIC FINAL? 
-	| FINAL? STATIC
+	: FINAL
+	| STATIC
+	| STATIC FINAL
+	| FINAL STATIC
 	;
 
+varDecl
+	: langTYPE oneAttr listAttr
+	; 
+
 oneAttr
-	: ID declAssignment?
+	: ID 
+	| ID declAssignment
 	;
 
 listAttr
@@ -57,8 +72,8 @@ declAssignment
 // METHOD MEMBER
 
 methodDecl
-	: preMethodDecl ID LP paramDecl? RP blockStmt
-	| ID LP paramDecl? RP blockStmt
+	: preMethodDecl ID LP paramDecl RP blockStmt
+	| ID LP paramDecl RP blockStmt
 	; 
 
 preMethodDecl
@@ -70,21 +85,24 @@ preMethodDecl
 
 paramDecl
 	: langTYPE oneAttr listAttr listParamDecl
+	|
 	;
 
 listParamDecl
-	: SIMI langTYPE oneAttr listAttr listParamDecl |
+	: SIMI langTYPE oneAttr listAttr listParamDecl 
+	|
 	;
 
 
 // STATEMENT
 
 blockStmt
-	: LCB singleStmt* RCB
+	: LCB varDeclStmt* singleStmt* RCB
 	;
 
 varDeclStmt
-	: FINAL? langTYPE oneAttr listAttr SIMI
+	: varDecl SIMI
+	| FINAL varDecl SIMI
 	;
 
 assignStmt
@@ -161,7 +179,6 @@ statement
 
 otherStmt
 	: forStmt
-	| varDeclStmt 
 	| assignStmt 
 	| funcCallStmt
 	| breakStmt
@@ -230,7 +247,7 @@ term_MemAccess
 	; // Member access @left
 
 term_ObjCreation
-	: NEW ID LP listExpr? RP
+	: NEW ID LP listExpr RP
 	| operands
 	; // Object Creation @right
 	
@@ -246,11 +263,12 @@ operands
 	;
 
 funcCallExpr
-	: ID LP listExpr? RP
+	: ID LP listExpr RP
 	; 
 
 listExpr
 	: expr nextExpr
+	|
 	;
 
 nextExpr
@@ -321,7 +339,7 @@ fragment EXPONENT: [Ee] ('+'|'-')? DIGIT+;
 INT_LIT: DIGIT+;
 fragment DIGIT: [0-9];
 
-STRING_LIT: '"' STR_CHAR* '"';
+STRING_LIT: '"' STR_CHAR* '"'{ self.text = self.text[1:-1] };
 BOOL_LIT: 'true' | 'false';
 
 PRIMITIVE
@@ -391,7 +409,7 @@ WS : [ \t\r\n\f]+ -> skip ; // skip spaces, tabs, newlines
 UNCLOSE_STRING: '"' STR_CHAR* 
 	{
 		y = str(self.text)
-		possible = ['\b', '\t', '\n', '\f', '\r', '"', "'", '\\']
+		possible = ['\n', '\r']
 		if y[-1] in possible:
 			raise UncloseString(y[1:-1])
 		else:
@@ -404,11 +422,11 @@ ILLEGAL_ESCAPE: '"' STR_CHAR* ESC_ILLEGAL
 		raise IllegalEscape(y[1:])
 	}
 	;
-fragment STR_CHAR: ~[\b\t\n\f\r"\\] | ESC_SEQ ;
+fragment STR_CHAR: ~[\n\r"\\] | ESC_ACCEPT ;
 
-fragment ESC_SEQ: '\\' ([btnfr"\\] | '\'') ;
+fragment ESC_ACCEPT: '\\' [btnfr"\\] ;
 
-fragment ESC_ILLEGAL: '\\' (~[btnfr"\\] | ~'\\') ;
+fragment ESC_ILLEGAL: '\\' ~[btnfr"\\] ;
 
 ERROR_CHAR: .
 	{
