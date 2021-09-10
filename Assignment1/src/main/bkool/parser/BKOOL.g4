@@ -93,7 +93,7 @@ assignStmt
 
 lhs
 	: scalarVar
-	| term_IndexExpr
+	| indexExpr
 	;
 
 scalarVar
@@ -107,6 +107,7 @@ singleStmt
 	| IF expr THEN statement
 	| otherStmt
 	;
+
 /*
 singleStmt
 	: matchStmt
@@ -211,12 +212,20 @@ term_6
 	; // + - (unary) @right
 
 term_IndexExpr
-	: term_MemAccess LSB expr RSB
+	: indexExpr
 	| term_MemAccess
 	; // INDEX expr
 
+indexExpr
+	: ID LSB expr RSB
+	| funcCallExpr LSB expr RSB
+	| term_MemAccess DOT ID LSB expr RSB
+	| term_MemAccess DOT funcCallExpr LSB expr RSB
+	;
+
 term_MemAccess
-	: term_MemAccess DOT (ID | funcCallExpr)
+	: term_MemAccess DOT ID 
+	| term_MemAccess DOT funcCallExpr
 	| term_ObjCreation
 	; // Member access @left
 
@@ -292,8 +301,9 @@ literal
 	| arrayLit
 	;
 
-arrayType: 
-	PRIMITIVE LSB INT_LIT RSB
+arrayType
+	: PRIMITIVE LSB INT_LIT RSB
+	| ID LSB INT_LIT RSB
 	;
 
 langTYPE
