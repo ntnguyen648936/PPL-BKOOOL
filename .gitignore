@@ -1,9 +1,12 @@
 # Project ignore
 solutions/
 testcases/
-Assignment1/src/main/bkool/parser/*.interp
-Assignment1/src/main/bkool/parser/*.tokens
-Assignment1/src/main/bkool/parser/BKOOL*.py
+*.interp
+*.tokens
+*.py
+
+BKOOL*.class
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
