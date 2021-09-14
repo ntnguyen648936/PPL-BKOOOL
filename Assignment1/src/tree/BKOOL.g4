@@ -5,12 +5,8 @@
 
 grammar BKOOL;
 
-@lexer::header {
-from lexererr import *
-}
-
 options{
-	language=Python3;
+	language=Java;
 }
 
 program  : classDecl+ EOF ;
@@ -98,17 +94,21 @@ listParamDecl
 
 statement
 	: blockStmt
-	| ifStmt
+	| singleStmt
+	;
+
+blockStmt
+	: LCB varDeclStmt* statement* RCB
+	;
+
+singleStmt
+	: ifStmt
 	| forStmt
 	| funcCallStmt
 	| assignStmt 
 	| breakStmt
 	| continueStmt
 	| retStmt
-	;
-
-blockStmt
-	: LCB varDeclStmt* statement* RCB
 	;
 
 /*
@@ -152,14 +152,9 @@ forStmt
 	;
 
 funcCallStmt
-	: ID LP listExpr RP SIMI
-	| memAccess DOT ID LP listExpr RP SIMI
+	: funcCallExpr SIMI
+	| term_MemAccess DOT funcCallExpr SIMI
 	; // Method invocation
-
-memAccess
-	: memAccess DOT ID (LP listExpr RP)?
-	| term_ObjCreation
-	;
 
 retStmt
 	: RETURN expr SIMI
@@ -220,13 +215,21 @@ term_IndexExpr
 	: indexExpr
 	| term_MemAccess
 	; // INDEX expr
-	
+/*
+indexExpr
+	: ID LSB expr RSB
+	| funcCallExpr LSB expr RSB
+	| term_MemAccess DOT ID LSB expr RSB
+	| term_MemAccess DOT funcCallExpr LSB expr RSB
+	;
+*/
 indexExpr
 	: term_MemAccess LSB expr RSB
 	;
 
 term_MemAccess
-	: term_MemAccess DOT ID (LP listExpr RP)?
+	: term_MemAccess DOT ID 
+	| term_MemAccess DOT funcCallExpr
 	| term_ObjCreation
 	; // Member access @left
 
@@ -322,12 +325,13 @@ fragment DECIMAL: DOT DIGIT*; // ditgit after decimal point is optinal
 fragment EXPONENT: [Ee] ('+'|'-')? DIGIT+;
 
 INT_LIT
-	: DIGIT+
+	: [1-9] DIGIT* 
+	| [0]
 	;
 	
 fragment DIGIT: [0-9];
 
-STRING_LIT: '"' STR_CHAR* '"'{ self.text = self.text[1:-1] };
+STRING_LIT: '"' STR_CHAR* '"';
 BOOL_LIT: 'true' | 'false';
 
 PRIMITIVE
@@ -395,20 +399,8 @@ WS : [ \t\r\n\f]+ -> skip ; // skip spaces, tabs, newlines
 
 
 UNCLOSE_STRING: '"' STR_CHAR* 
-	{
-		y = str(self.text)
-		possible = ['\n', '\r']
-		if y[-1] in possible:
-			raise UncloseString(y[1:-1])
-		else:
-			raise UncloseString(y[1:])
-	}
 	;
 ILLEGAL_ESCAPE: '"' STR_CHAR* ESC_ILLEGAL
-	{
-		y = str(self.text)
-		raise IllegalEscape(y[1:])
-	}
 	;
 fragment STR_CHAR: ~[\n\r"\\] | ESC_ACCEPT ;
 
@@ -417,7 +409,4 @@ fragment ESC_ACCEPT: '\\' [btnfr"\\] ;
 fragment ESC_ILLEGAL: '\\' ~[btnfr"\\] ;
 
 ERROR_CHAR: .
-	{
-		raise ErrorToken(self.text)
-	}
 	;

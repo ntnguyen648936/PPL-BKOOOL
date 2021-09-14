@@ -3,7 +3,7 @@ class LexerError(ABC,Exception):
 	pass
 class ErrorToken(LexerError):
     def __init__(self,s):
-        self.message = "ErrorToken "+ s
+        self.message = "Error Token "+ s
 
 class UncloseString(LexerError):
     def __init__(self,s):
@@ -11,7 +11,7 @@ class UncloseString(LexerError):
 
 class IllegalEscape(LexerError):
     def __init__(self,s):
-        self.message = "Illegal escape in string: "+ s
+        self.message = "Illegal Escape In String: "+ s
 
 
 

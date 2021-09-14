@@ -319,6 +319,7 @@ r"""
 class ABC extends XYZ { 
     static int foo() { 
         _a[3+x.foo(2)] := a==b<=c;
+        _a[3] := true;
     }
 }
 """
@@ -449,7 +450,7 @@ class ABC extends XYZ {
     }
 }
 """
-        expect = "Error on line 4 col 31: ["
+        expect = "successful"
         self.assertTrue(TestParser.test(input,expect,237))
 
 
@@ -1007,7 +1008,7 @@ class abc {
     }
 }
 """
-        expect = "Error on line 4 col 8: {"
+        expect = "successful"
         self.assertTrue(TestParser.test(input,expect,276))
 
     def test_statement_27(self):
@@ -1031,7 +1032,7 @@ class abc {
     }
 }
 """
-        expect = "Error on line 4 col 14: 1"
+        expect = "Error on line 4 col 13: ."
         self.assertTrue(TestParser.test(input,expect,278))
 
     def test_statement_29(self):
@@ -1068,6 +1069,187 @@ class ABC extends XYZ {
         expect = "Error on line 5 col 18: float"
         self.assertTrue(TestParser.test(input,expect,280))
 
+    def test_statement_31(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        Shape s = nil;
+    }
+}
+
+"""
+        expect = "successful"
+        self.assertTrue(TestParser.test(input,expect,281))
+
+    def test_statement_32(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        Shape s = Shape.CreateNew();
+        s.this.foo();
+    }
+}
+
+"""
+        expect = "Error on line 5 col 10: this"
+        self.assertTrue(TestParser.test(input,expect,282))
+
+    def test_statement_33(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        {
+            break;
+        }
+        for i:=0 to 10 do {{{ continue; } {s := new A();}}}
+        {
+            this.a := 0;
+            this.a.foo(this.a + 2 * 5 % 2 && True);
+            new IO().a.print(100000);
+        }
+    }
+}
+
+"""
+        expect = "successful"
+        self.assertTrue(TestParser.test(input,expect,283))
+
+    def test_statement_34(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        [
+            break;
+        ]
+        for i:=0 to 10 do { continue; }
+        {
+            io.writeIntLn(100000);
+        }
+    }
+}
+
+"""
+        expect = "Error on line 4 col 8: ["
+        self.assertTrue(TestParser.test(input,expect,284))
+
+    def test_statement_35(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        for i:=0 to 10 do ( continue; )
+        {
+            io.writeIntLn(100000);
+        }
+    }
+}
+
+"""
+        expect = "Error on line 4 col 28: continue"
+        self.assertTrue(TestParser.test(input,expect,285))
+
+    def test_statement_36(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        {{
+            int a = 1;
+            a();
+            io.oi.abc.def().io.writeStr(s.name);
+            int x = a;
+        }}
+    }
+}
+
+"""
+        expect = "Error on line 8 col 12: int"
+        self.assertTrue(TestParser.test(input,expect,286))
+
+    def test_statement_37(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        Shape s = new Shape();
+        for i:=0 to 10 do ( s ).width := 2;
+        writeStr(s.name);
+        int a = 0;
+    }
+}
+
+"""
+        expect = "Error on line 7 col 8: int"
+        self.assertTrue(TestParser.test(input,expect,287))
+
+    def test_statement_38(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        Shape s = new Shape();
+        for i:=0 to 10 do ( s ).width := 2;
+        {
+            writeStr(s.name);
+            int a = 0;
+        }
+    }
+}
+
+"""
+        expect = "Error on line 8 col 12: int"
+        self.assertTrue(TestParser.test(input,expect,288))
+        
+    def test_statement_39(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        Shape s = new Shape();
+        for i:=0 to 10 do ( s ).width := 2;
+        {
+            {}
+            {}
+            writeStr(s.name);
+            a := 0;
+        }
+    }
+}
+
+"""
+        expect = "successful"
+        self.assertTrue(TestParser.test(input,expect,289))
+
+    def test_statement_40(self):
+        input = \
+r"""
+class Main {
+    void main() {
+        Shape s = new Shape();
+        for i:=0 to 10 do ( s ).width := 2;
+        {
+            {
+                {}
+                {}
+                writeStr(s.name);
+                a := 0;
+                {
+                    var a = 1;
+                    a := a + 1;
+                }
+            }
+        }
+    }
+}
+
+"""
+        expect = "successful"
+        self.assertTrue(TestParser.test(input,expect,290))
+
     # ---------------------------------------------------------------------------------------------------------
 
 
@@ -1090,7 +1272,7 @@ class Rectangle extends Shape {
 
 """
         expect = "successful"
-        self.assertTrue(TestParser.test(input,expect,281))
+        self.assertTrue(TestParser.test(input,expect,291))
 
 
     def test_complex_program_02(self):
@@ -1112,7 +1294,8 @@ class Rectangle extends Shape {
 
 """
         expect = "Error on line 10 col 0: class"
-        self.assertTrue(TestParser.test(input,expect,282))
+        self.assertTrue(TestParser.test(input,expect,292))
+
 
     def test_complex_program_03(self):
         input = \
@@ -1133,7 +1316,8 @@ class Rectangle extends Shape {
 
 """
         expect = "Error on line 6 col 27: ("
-        self.assertTrue(TestParser.test(input,expect,283))
+        self.assertTrue(TestParser.test(input,expect,293))
+
 
     def test_complex_program_04(self):
         input = \
@@ -1154,7 +1338,8 @@ class Rectangle extends Shape {
 
 """
         expect = "Error on line 7 col 18: ;"
-        self.assertTrue(TestParser.test(input,expect,284))
+        self.assertTrue(TestParser.test(input,expect,294))
+
 
     def test_complex_program_05(self):
         input = \
@@ -1175,7 +1360,8 @@ class Rectangle extends Shape {
 
 """
         expect = "Error on line 7 col 18: ;"
-        self.assertTrue(TestParser.test(input,expect,285))
+        self.assertTrue(TestParser.test(input,expect,295))
+
 
     def test_complex_program_06(self):
         input = \
@@ -1204,15 +1390,16 @@ class Angel extends Shape {
 }
 
 class Main {
-
     void main(){
-        Shape s = Shape();
+        Shape s = new Shape(); # Shape is a Class name
+        Shape s = Shape(); # Shape is a function
     }
 }
 
 """
         expect = "successful"
-        self.assertTrue(TestParser.test(input,expect,286))
+        self.assertTrue(TestParser.test(input,expect,296))
+
 
     def test_complex_program_07(self):
         input = \
@@ -1249,87 +1436,10 @@ class Main {
 
 """
         expect = "Error on line 12 col 18: ;"
-        self.assertTrue(TestParser.test(input,expect,287))
-
-    def test_complex_program_08(self):
-        input = \
-r"""
-class Shape {
-    static final int numOfShape = 0;
-    final int immuAttribute = 0;
-    float length,width;
-    
-    Shape() {
-
-    }
-
-    static int getNumOfShape() {
-        return numOfShape;
-    }
-}
-class Rectangle extends Shape {
-    float getArea(){
-        return this.length;
-    }
-}
-
-class Angel extends Shape {
-
-}
-
-class Main {
-
-    void main()
-        Shape s = Shape();
-    }
-}
-
-"""
-        expect = "Error on line 28 col 8: Shape"
-        self.assertTrue(TestParser.test(input,expect,288))
-
-    def test_complex_program_08(self):
-        input = \
-r"""
-class Shape {
-    static final int numOfShape = 0;
-    final int immuAttribute = 0;
-    float length,width;
-    
-    Shape() {
-
-    }
-
-    static int getNumOfShape() {
-        return numOfShape;
-    }
-}
-class Rectangle extends Shape {
-    float getArea(){
-        return this.length;
-    }
-}
-
-class Angel extends Shape {
-
-}
-
-class Main {
-
-    void main()
-        Shape s = Shape();
-    }
-}
-
-"""
-        expect = "Error on line 28 col 8: Shape"
-        self.assertTrue(TestParser.test(input,expect,288))
+        self.assertTrue(TestParser.test(input,expect,297))
 
 
-    # ---------------------------------------------------------------------------------------------------------
-
-
-    def test_most_complex_program_01(self):
+    def test_most_complex_program_08(self):
         input = \
 r"""
 class Shape {
@@ -1362,10 +1472,10 @@ class Example2 {
 
 """
         expect = "successful"
-        self.assertTrue(TestParser.test(input,expect,291))
+        self.assertTrue(TestParser.test(input,expect,298))
 
 
-    def test_most_complex_program_02(self):
+    def test_most_complex_program_09(self):
         input = \
 r"""
 class QuickSort {
@@ -1408,4 +1518,55 @@ class QuickSort {
 }
 """
         expect = "successful"
-        self.assertTrue(TestParser.test(input,expect,292))
+        self.assertTrue(TestParser.test(input,expect,299))
+    
+
+    def test_most_complex_program_10(self):
+        input = \
+r"""
+class QuickSort {
+    
+    int partition(int[6] arr; int low, high)
+    {
+        int i = (low-1), pivot = arr[high];    
+    
+        for j :=low to high do
+            if arr[j] <= pivot then
+            { 
+                i := i+1;
+                arr[i] := arr[j];
+                arr[j] :=arr[i];
+            }
+    
+        arr[i+1] := arr[high];
+        arr[high] := arr[i+1];
+        return (i+1);
+    }
+    
+    void quickSort(int[6] arr; int low, high) {
+        {
+            { 
+                if len(arr) == 1 then
+                    return arr;
+                if low < high then
+                    pi := partition(arr, low, high);
+            }
+
+            this.quickSort(arr, low, pi-1);
+            this.quickSort(arr, pi+1, high);
+        }
+    }
+    
+    void main() {
+        int[6] arr = {10, 7, 8, 9, 1, 5};
+        int n = 6;
+        this.quickSort(arr, 0, n-1);
+        io.writeStr("Sorted array is:");
+        for i := 0 to n do
+            io.writeInt(arr[i]);
+    }
+}
+"""
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 300))
+
