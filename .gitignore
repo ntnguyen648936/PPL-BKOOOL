@@ -1,11 +1,12 @@
 # Project ignore
 solutions/
 testcases/
-*.interp
-*.tokens
-*.py
+BKOOL*.interp
+BKOOL*.tokens
+BKOOL*.py
 
 BKOOL*.class
+BKOOL*.java
 
 
 # Byte-compiled / optimized / DLL files
