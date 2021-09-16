@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod, ABCMeta
 from Visitor import Visitor
-from dataclasses import dataclass
+#from dataclasses import dataclass
 from typing import List, Tuple
 
 
@@ -33,7 +33,7 @@ class MemDecl(AST):
     __metaclass__ = ABCMeta
     pass
 
-@dataclass
+#@dataclass
 class Id(LHS):
     name:str
     def __str__(self):
@@ -41,7 +41,7 @@ class Id(LHS):
         
 
 # used for binary expression
-@dataclass
+#@dataclass
 class BinaryOp(Expr):
     op:str
     left:Expr
@@ -50,14 +50,14 @@ class BinaryOp(Expr):
         return "BinaryOp(" + self.op + "," + str(self.left) + "," + str(self.right) + ")"
 
 #used for unary expression with orerand like !,+,-
-@dataclass
+#@dataclass
 class UnaryOp(Expr):
     op:str
     body:Expr
     def __str__(self):
         return "UnaryOp(" + self.op + "," + str(self.body) + ")"
 
-@dataclass
+#@dataclass
 class CallExpr(Expr):
     obj: Expr
     method:Id
@@ -65,21 +65,21 @@ class CallExpr(Expr):
     def __str__(self):
         return "CallExpr(" + str(self.obj) + "," + str(self.method) + ",[" +  ','.join(str(i) for i in self.param) + "])"
 
-@dataclass
+#@dataclass
 class NewExpr(Expr):
     classname:Id
     param:List[Expr]
     def __str__(self):
         return "NewExpr(" + str(self.classname) + ",[" +  ','.join(str(i) for i in self.param) + "])"
 
-@dataclass
+#@dataclass
 class ArrayCell(LHS):
     arr:Expr
     idx:Expr
     def __str__(self):
         return "ArrayCell(" + str(self.arr) + "," + str(self.idx) + ")"
 
-@dataclass
+#@dataclass
 class FieldAccess(LHS):
     obj:Expr
     fieldname:Id
@@ -90,25 +90,25 @@ class Literal(Expr):
     __metaclass__ = ABCMeta
     pass
 
-@dataclass
+#@dataclass
 class IntLiteral(Literal):
     value:int
     def __str__(self):
         return "IntLit(" + str(self.value) + ")"
 
-@dataclass
+#@dataclass
 class FloatLiteral(Literal):
     value:float
     def __str__(self):
         return "FloatLit(" + str(self.value) + ")"
 
-@dataclass
+#@dataclass
 class StringLiteral(Literal):
     value:str
     def __str__(self):
         return "StringLit(" + self.value + ")"
 
-@dataclass
+#@dataclass
 class BooleanLiteral(Literal):
     value:bool
     def __str__(self):
@@ -121,7 +121,7 @@ class NullLiteral(Literal):
 class SelfLiteral(Literal):
     def __str__(self):
         return "Self()"
-@dataclass
+#@dataclass
 class ArrayLiteral(Literal):
     value: List[Literal]
     def __str__(self):
@@ -130,14 +130,14 @@ class Decl(AST):
     __metaclass__ = ABCMeta
     pass
 
-@dataclass
+#@dataclass
 class Assign(Stmt):
     lhs:Expr
     exp:Expr
     def __str__(self):
         return "AssignStmt(" + str(self.lhs) + "," +  str(self.exp) + ")"
 
-@dataclass
+#@dataclass
 class If(Stmt):
     expr:Expr
     thenStmt:Stmt
@@ -145,7 +145,7 @@ class If(Stmt):
     def __str__(self):
         return "If(" + str(self.expr) + "," + str(self.thenStmt) + (("," +  str(self.elseStmt)) if self.elseStmt else "")  + ")"
 
-@dataclass
+#@dataclass
 class For(Stmt):
     id:Id
     expr1:Expr
@@ -163,13 +163,13 @@ class Continue(Stmt):
     def __str__(self):
         return "Continue"
 
-@dataclass
+#@dataclass
 class Return(Stmt):
     expr:Expr
     def __str__(self):
         return "Return(" + str(self.expr) + ")"
 
-@dataclass
+#@dataclass
 class CallStmt(Stmt):
     obj: Expr  
     method:Id
@@ -178,7 +178,7 @@ class CallStmt(Stmt):
         return "Call(" + str(self.obj) + "," + str(self.method) + ",[" +  ','.join(str(i) for i in self.param) + "])"
 
 # used for local variable or parameter declaration 
-@dataclass
+#@dataclass
 class VarDecl(Decl):
     variable : Id
     varType : Type
@@ -188,7 +188,7 @@ class VarDecl(Decl):
     def toParam(self):
         return "param(" + str(self.variable) + "," + str(self.varType) + ")"
 
-@dataclass
+#@dataclass
 class Block(Stmt):
     decl:List[VarDecl]
     stmt:List[Stmt]
@@ -197,7 +197,7 @@ class Block(Stmt):
 
 
 # used for local constant declaration
-@dataclass
+#@dataclass
 class ConstDecl(Decl):
     constant : Id
     constType : Type
@@ -207,7 +207,7 @@ class ConstDecl(Decl):
 
  
 #used for a class declaration
-@dataclass
+#@dataclass
 class ClassDecl(Decl):
     classname : Id
     memlist : List[MemDecl]
@@ -232,7 +232,7 @@ class Static(SIKind):
 # In the case of special method declaration,the name will be Id("<init>") 
 # and the return type is VoidType(). 
 # In the case of normal method declaration, the name and the return type are from the declaration.
-@dataclass
+#@dataclass
 class MethodDecl(MemDecl):
     kind: SIKind
     name: Id
@@ -242,7 +242,7 @@ class MethodDecl(MemDecl):
     def __str__(self):
         return "MethodDecl(" + str(self.name) + ',' + str(self.kind) + ",[" +  ','.join(i.toParam() for i in self.param) + "]," + ((str(self.returnType) + ",") if self.returnType else "") + str(self.body) + ")"
 # used for mutable (variable) or immutable (constant) declaration
-@dataclass
+#@dataclass
 class AttributeDecl(MemDecl):
     kind: SIKind #Instance or Static
     decl: Decl # VarDecl for mutable or ConstDecl for immutable
@@ -266,14 +266,14 @@ class StringType(Type):
     def __str__(self):
         return "StringType"
 
-@dataclass
+#@dataclass
 class ArrayType(Type):
     size : int
     eleType:Type
     def __str__(self):
         return "ArrayType(" + str(self.size) +  "," + str(self.eleType) + ")"
 
-@dataclass
+#@dataclass
 class ClassType(Type):
     classname:Id
     def __str__(self):
@@ -286,7 +286,7 @@ class VoidType(Type):
 
 
 # used for whole program
-@dataclass
+#@dataclass
 class Program(AST):
     decl : List[ClassDecl]
     def __str__(self):

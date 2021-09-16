@@ -18,20 +18,10 @@ program  : classDecl+ EOF ;
 // CLASS DECLARE
 
 classDecl
-	: CLASS ID LCB classBody RCB
-	| CLASS ID classDeclExtension LCB classBody RCB
+	: CLASS ID (EXTENDS ID)? LCB memberDecl* RCB
 	;
 
-classDeclExtension
-	: EXTENDS ID
-	;
-
-classBody
-	: members*
-	|
-	; // nullable list of members 
-
-members
+memberDecl
 	: attrDecl 
 	| methodDecl
 	;
@@ -51,7 +41,7 @@ attrPreDecl
 	;
 
 varDecl
-	: langTYPE oneAttr listAttr
+	: bkoolType oneAttr listAttr
 	; 
 
 oneAttr
@@ -77,19 +67,19 @@ methodDecl
 	; 
 
 preMethodDecl
-	: langTYPE
+	: bkoolType
 	| VOID
-	| STATIC langTYPE
+	| STATIC bkoolType
 	| STATIC VOID
 	;
 
 paramDecl
-	: langTYPE oneAttr listAttr listParamDecl
+	: bkoolType oneAttr listAttr listParamDecl
 	|
 	;
 
 listParamDecl
-	: SIMI langTYPE oneAttr listAttr listParamDecl 
+	: SIMI bkoolType oneAttr listAttr listParamDecl 
 	|
 	;
 
@@ -139,7 +129,7 @@ assignStmt
 
 lhs
 	: indexExpr
-	| term_MemAccess DOT ID
+	| termMemAccess DOT ID
 	| ID
 	;
 
@@ -158,7 +148,7 @@ funcCallStmt
 
 memAccess
 	: memAccess DOT ID (LP listExpr RP)?
-	| term_ObjCreation
+	| termObjCreation
 	;
 
 retStmt
@@ -177,60 +167,60 @@ breakStmt
 // EXPRESSION
 
 expr
-	: term_0 (LOWER | GREATER | LOWER_E | GREATER_E) term_0
-	| term_0
+	: term0 (LOWER | GREATER | LOWER_E | GREATER_E) term0
+	| term0
 	; // < > <= >=
 
-term_0
-	: term_1 (EQUALS | NOT_EQUALS) term_1
-	| term_1
+term0
+	: term1 (EQUALS | NOT_EQUALS) term1
+	| term1
 	; // == !=
 
-term_1
-	: term_1 (AND | OR) term_2
-	| term_2
+term1
+	: term1 (AND | OR) term2
+	| term2
 	; // && || @left
 	
-term_2
-	: term_2 (PLUS | MINUS) term_3
-	| term_3
+term2
+	: term2 (PLUS | MINUS) term3
+	| term3
 	; // + - (binary) @left
 
-term_3
-	: term_3 (MUL | INT_DIV | FLOAT_DIV | PERCENT) term_4
-	| term_4
+term3
+	: term3 (MUL | INT_DIV | FLOAT_DIV | PERCENT) term4
+	| term4
 	; //  * / \ & @left
 
-term_4
-	: term_4 CONCAT term_5
-	| term_5
+term4
+	: term4 CONCAT term5
+	| term5
 	; // ^ (concat string) @left
 
-term_5
-	: NOT term_5
-	| term_6
+term5
+	: NOT term5
+	| term6
 	; // ! (not) @right
 
-term_6
-	: (PLUS | MINUS) term_6
-	| term_IndexExpr
+term6
+	: (PLUS | MINUS) term6
+	| termIndexExpr
 	; // + - (unary) @right
 
-term_IndexExpr
+termIndexExpr
 	: indexExpr
-	| term_MemAccess
+	| termMemAccess
 	; // INDEX expr
 	
 indexExpr
-	: term_MemAccess LSB expr RSB
+	: termMemAccess LSB expr RSB
 	;
 
-term_MemAccess
-	: term_MemAccess DOT ID (LP listExpr RP)?
-	| term_ObjCreation
+termMemAccess
+	: termMemAccess DOT ID (LP listExpr RP)?
+	| termObjCreation
 	; // Member access @left
 
-term_ObjCreation
+termObjCreation
 	: NEW ID LP listExpr RP
 	| operands
 	; // Object Creation @right
@@ -309,7 +299,7 @@ arrayType
 	| ID LSB INT_LIT RSB
 	;
 
-langTYPE
+bkoolType
 	: PRIMITIVE
 	| arrayType
 	| ID

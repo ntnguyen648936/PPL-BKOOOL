@@ -5,15 +5,16 @@ from AST import *
 class ASTGeneration(BKOOLVisitor):
 
     def visitProgram(self,ctx:BKOOLParser.ProgramContext):
-        return Program([self.visit(x) for x in ctx.classdecl()])
+        return Program([self.visit(x) for x in ctx.classDecl()])
 
-    def visitClassdecl(self,ctx:BKOOLParser.ClassdeclContext):
-        return ClassDecl(Id(ctx.ID().getText()),[self.visit(x) for x in ctx.memdecl()])
+    def visitClassDecl(self,ctx:BKOOLParser.ClassDeclContext):
+        parent = Id(ctx.ID(1).getText()) if ctx.ID(1) else None
+        return ClassDecl(Id(ctx.ID(0).getText()),[self.visit(x) for x in ctx.memberDecl()], parent)
 
-    def visitMemdecl(self,ctx:BKOOLParser.MemdeclContext):
-        return AttributeDecl(Instance(),VarDecl(Id(ctx.ID().getText()),self.visit(ctx.bkooltype())))
+    def visitMemberDecl(self,ctx:BKOOLParser.MemberDeclContext):
+        return AttributeDecl(Instance(),VarDecl(Id(ctx.ID().getText()),self.visit(ctx.bkoolType())))
 
-    def visitBkooltype(self,ctx:BKOOLParser.BkooltypeContext):
+    def visitBkoolType(self,ctx:BKOOLParser.BkoolTypeContext):
         return IntType() if ctx.INTTYPE() else VoidType()
         
 
