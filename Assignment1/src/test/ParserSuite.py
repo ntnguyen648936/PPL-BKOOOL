@@ -22,7 +22,7 @@ class ABC extends XYZ { }
         input = \
 r"""
 class ABC extends XYZ { 
-    int foo() { 
+    int foo(int a,b,c;float d) { 
 
     }
 }

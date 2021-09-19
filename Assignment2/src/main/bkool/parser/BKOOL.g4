@@ -30,10 +30,10 @@ memberDecl
 
 attrDecl
 	: varDecl SIMI
-	| attrPreDecl varDecl SIMI
+	| preAttrDecl varDecl SIMI
 	; 
 
-attrPreDecl
+preAttrDecl
 	: FINAL
 	| STATIC
 	| STATIC FINAL
@@ -41,16 +41,16 @@ attrPreDecl
 	;
 
 varDecl
-	: bkoolType oneAttr listAttr
+	: bkoolType oneVarDecl listVarDecl
 	; 
 
-oneAttr
+oneVarDecl
 	: ID 
 	| ID declAssignment
 	;
 
-listAttr
-	: COMMA oneAttr listAttr 
+listVarDecl
+	: COMMA oneVarDecl listVarDecl 
 	| 
 	;
 
@@ -63,26 +63,33 @@ declAssignment
 
 methodDecl
 	: preMethodDecl ID LP paramDecl RP blockStmt
+	| preMethodDecl ID LP RP blockStmt
 	| ID LP paramDecl RP blockStmt
+	| ID LP RP blockStmt
 	; 
 
 preMethodDecl
 	: bkoolType
-	| VOID
 	| STATIC bkoolType
-	| STATIC VOID
 	;
 
 paramDecl
-	: bkoolType oneAttr listAttr listParamDecl
-	|
+	: oneParamDecl listParamDecl
 	;
 
 listParamDecl
-	: SIMI bkoolType oneAttr listAttr listParamDecl 
+	: SIMI oneParamDecl listParamDecl 
 	|
 	;
 
+oneParamDecl
+	: bkoolType ID listID
+	;
+
+listID
+	: COMMA ID listID
+	|
+	;
 
 // STATEMENT
 
@@ -94,7 +101,7 @@ statement
 	| assignStmt 
 	| breakStmt
 	| continueStmt
-	| retStmt
+	| returnStmt
 	;
 
 blockStmt
@@ -138,7 +145,8 @@ ifStmt
 	;
 
 forStmt
-	: FOR ID ASSIGN expr TO_DOWNTO expr DO statement
+	: FOR ID ASSIGN expr TO expr DO statement
+	| FOR ID ASSIGN expr DOWNTO expr DO statement
 	;
 
 funcCallStmt
@@ -151,7 +159,7 @@ memAccess
 	| termObjCreation
 	;
 
-retStmt
+returnStmt
 	: RETURN expr SIMI
 	;
 
@@ -229,7 +237,7 @@ operands
 	: LP expr RP
 	| funcCallExpr
 	| INT_LIT 
-	| FLOATLIT 
+	| FLOAT_LIT 
 	| BOOL_LIT
 	| STRING_LIT
 	| NIL
@@ -285,7 +293,7 @@ listOfPrimLit
 primLit	
 	: INT_LIT 
 	| STRING_LIT 
-	| FLOATLIT 
+	| FLOAT_LIT 
 	| BOOL_LIT 
 	;
 
@@ -307,7 +315,7 @@ bkoolType
 
 // ----------- TOKENS ---------------------------------------------
 
-FLOATLIT: DIGIT+ (DECIMAL | EXPONENT | DECIMAL EXPONENT);
+FLOAT_LIT: DIGIT+ (DECIMAL | EXPONENT | DECIMAL EXPONENT);
 fragment DECIMAL: DOT DIGIT*; // ditgit after decimal point is optinal
 fragment EXPONENT: [Ee] ('+'|'-')? DIGIT+;
 
@@ -325,9 +333,9 @@ PRIMITIVE
 	| 'float' 
 	| 'boolean' 
 	| 'string'
+	| 'void'
 	;
 
-VOID: 'void';
 CLASS: 'class';
 FINAL: 'final';
 STATIC: 'static';
@@ -339,7 +347,8 @@ FOR: 'for';
 THEN: 'then';
 NIL: 'nil';
 IF: 'if';
-TO_DOWNTO: 'to' | 'downto';
+TO: 'to';
+DOWNTO: 'downto';
 DO: 'do';
 BREAK: 'break';
 ELSE: 'else';

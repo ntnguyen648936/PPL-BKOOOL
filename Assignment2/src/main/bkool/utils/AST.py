@@ -35,7 +35,9 @@ class MemDecl(AST):
 
 #@dataclass
 class Id(LHS):
-    name:str
+    def __init__(self,name:str):
+        self.name = name
+
     def __str__(self):
         return "Id(" + self.name + ")"
         
@@ -43,46 +45,72 @@ class Id(LHS):
 # used for binary expression
 #@dataclass
 class BinaryOp(Expr):
-    op:str
-    left:Expr
-    right:Expr
+    # op:str
+    # left:Expr
+    # right:Expr
+    def __init__(self,op:str,left:Expr,right:Expr):
+        self.op = op
+        self.left = left
+        self.right = right
+
     def __str__(self):
         return "BinaryOp(" + self.op + "," + str(self.left) + "," + str(self.right) + ")"
 
 #used for unary expression with orerand like !,+,-
 #@dataclass
 class UnaryOp(Expr):
-    op:str
-    body:Expr
+    # op:str
+    # body:Expr
+    def __init__(self,op:str,body:Expr):
+        self.op = op
+        self.body = body
+
     def __str__(self):
         return "UnaryOp(" + self.op + "," + str(self.body) + ")"
 
 #@dataclass
 class CallExpr(Expr):
-    obj: Expr
-    method:Id
-    param:List[Expr]
+    # obj: Expr
+    # method:Id
+    # param:List[Expr]
+    def __init__(self,obj:Expr,method:Id,param:List[Expr]):
+        self.obj = obj
+        self.method = method
+        self.param = param
+
     def __str__(self):
         return "CallExpr(" + str(self.obj) + "," + str(self.method) + ",[" +  ','.join(str(i) for i in self.param) + "])"
 
 #@dataclass
 class NewExpr(Expr):
-    classname:Id
-    param:List[Expr]
+    # classname:Id
+    # param:List[Expr]
+    def __init__(self,classname:Id,param:List[Expr]):
+        self.classname = classname
+        self.param = param
+
     def __str__(self):
         return "NewExpr(" + str(self.classname) + ",[" +  ','.join(str(i) for i in self.param) + "])"
 
 #@dataclass
 class ArrayCell(LHS):
-    arr:Expr
-    idx:Expr
+    # arr:Expr
+    # idx:Expr
+    def __init__(self,arr:Expr,idx:Expr):
+        self.arr = arr
+        self.idx = idx
+
     def __str__(self):
         return "ArrayCell(" + str(self.arr) + "," + str(self.idx) + ")"
 
 #@dataclass
 class FieldAccess(LHS):
-    obj:Expr
-    fieldname:Id
+    # obj:Expr
+    # fieldname:Id
+    def __init__(self,obj:Expr,fieldname:Id):
+        self.fieldname = fieldname
+        self.obj = obj
+
     def __str__(self):
         return "FieldAccess(" + str(self.obj) + "," + str(self.fieldname) + ")"
 
@@ -93,24 +121,35 @@ class Literal(Expr):
 #@dataclass
 class IntLiteral(Literal):
     value:int
+    def __init__(self,value:int):
+        self.value = value
+
     def __str__(self):
         return "IntLit(" + str(self.value) + ")"
 
 #@dataclass
 class FloatLiteral(Literal):
-    value:float
+    # value:float
+    def __init__(self,value:float):
+        self.value = value
+
     def __str__(self):
         return "FloatLit(" + str(self.value) + ")"
 
 #@dataclass
 class StringLiteral(Literal):
-    value:str
+    # value:str
+    def __init__(self,value:str):
+        self.value = value
+
     def __str__(self):
         return "StringLit(" + self.value + ")"
 
 #@dataclass
 class BooleanLiteral(Literal):
-    value:bool
+    def __init__(self,value:bool):
+        self.value = value
+
     def __str__(self):
         return "BooleanLit(" + str(self.value) + ")"
 
@@ -123,35 +162,56 @@ class SelfLiteral(Literal):
         return "Self()"
 #@dataclass
 class ArrayLiteral(Literal):
-    value: List[Literal]
+    # value: List[Literal]
+    def __init__(self,value:List[Literal]):
+        self.value = value
+
     def __str__(self):
         return '[' + ','.join(str(i) for i in self.value)+ ']'
+        
 class Decl(AST):
     __metaclass__ = ABCMeta
     pass
 
 #@dataclass
 class Assign(Stmt):
-    lhs:Expr
-    exp:Expr
+    # lhs:Expr
+    # exp:Expr
+    def __init__(self,lhs:Expr,exp:Expr):
+        self.lhs = lhs
+        self.exp = exp
+
     def __str__(self):
         return "AssignStmt(" + str(self.lhs) + "," +  str(self.exp) + ")"
 
 #@dataclass
 class If(Stmt):
-    expr:Expr
-    thenStmt:Stmt
-    elseStmt:Stmt = None # None if there is no else branch
+    # expr:Expr
+    # thenStmt:Stmt
+    # elseStmt:Stmt = None # None if there is no else branch
+
+    def __init__(self,expr:Expr,thenStmt:Stmt,elseStmt:Stmt=None):
+        self.expr = expr
+        self.thenStmt = thenStmt
+        self.elseStmt = elseStmt
+
     def __str__(self):
         return "If(" + str(self.expr) + "," + str(self.thenStmt) + (("," +  str(self.elseStmt)) if self.elseStmt else "")  + ")"
 
 #@dataclass
 class For(Stmt):
-    id:Id
-    expr1:Expr
-    expr2:Expr
-    up: bool #True => increase; False => decrease
-    loop:Stmt  
+    # id:Id
+    # expr1:Expr
+    # expr2:Expr
+    # up: bool #True => increase; False => decrease
+    # loop:Stmt  
+    def __init__(self,id:Id,expr1:Expr,expr2:Expr,up:bool,loop:Stmt):
+        self.id = id
+        self.expr1 = expr1
+        self.expr2 = expr2
+        self.up = up
+        self.loop = loop
+
     def __str__(self):
         return "For(" + str(self.id) + "," + str(self.expr1) + "," + str(self.expr2) + "," + str(self.up) + ',' + str(self.loop)  + "])"
 
@@ -165,24 +225,37 @@ class Continue(Stmt):
 
 #@dataclass
 class Return(Stmt):
-    expr:Expr
+    # expr:Expr
+    def __init__(self,expr:Expr):
+        self.expr = expr
+    
     def __str__(self):
         return "Return(" + str(self.expr) + ")"
 
 #@dataclass
 class CallStmt(Stmt):
-    obj: Expr  
-    method:Id
-    param:List[Expr]
+    # obj: Expr  
+    # method:Id
+    # param:List[Expr]
+    def __init__(self,obj:Expr,method:Id,param:List[Expr]):
+        self.obj = obj
+        self.method = method
+        self.param = param
+
     def __str__(self):
         return "Call(" + str(self.obj) + "," + str(self.method) + ",[" +  ','.join(str(i) for i in self.param) + "])"
 
 # used for local variable or parameter declaration 
 #@dataclass
 class VarDecl(Decl):
-    variable : Id
-    varType : Type
-    varInit : Expr = None # None if there is no initial
+    # variable : Id
+    # varType : Type
+    # varInit : Expr = None # None if there is no initial
+    def __init__(self,variable:Id,varType:Type,varInit:Expr=None):
+        self.variable = variable
+        self.varType = varType
+        self.varInit = varInit
+
     def __str__(self):
         return "VarDecl(" + str(self.variable) + "," + str(self.varType) + (","+ str(self.varInit) if self.varInit else "") + ")"
     def toParam(self):
@@ -190,8 +263,12 @@ class VarDecl(Decl):
 
 #@dataclass
 class Block(Stmt):
-    decl:List[VarDecl]
-    stmt:List[Stmt]
+    # decl:List[VarDecl]
+    # stmt:List[Stmt]
+    def __init__(self,decl:List[VarDecl],stmt:List[Stmt]):
+        self.decl = decl
+        self.stmt = stmt
+
     def __str__(self):
         return "Block([" + ','.join(str(i) for i in self.decl) + "],[" + ','.join(str(i) for i in self.stmt) + "])"
 
@@ -199,9 +276,14 @@ class Block(Stmt):
 # used for local constant declaration
 #@dataclass
 class ConstDecl(Decl):
-    constant : Id
-    constType : Type
-    value : Literal
+    # constant : Id
+    # constType : Type
+    # value : Literal
+    def __init__(self,constant:Id,constType:Type,value:Literal):
+        self.constant = constant
+        self.constType = constType
+        self.value = value
+
     def __str__(self):
         return "ConstDecl(" + str(self.constant) + "," + str(self.constType) + "," + str(self.value) + ")"
 
@@ -209,9 +291,14 @@ class ConstDecl(Decl):
 #used for a class declaration
 #@dataclass
 class ClassDecl(Decl):
-    classname : Id
-    memlist : List[MemDecl]
-    parentname : Id = None # None if there is no parent
+    # classname : Id
+    # memlist : List[MemDecl]
+    # parentname : Id = None # None if there is no parent
+    def __init__(self,classname:Id,memlist:List[MemDecl],parentname:Id=None):
+        self.classname = classname
+        self.memlist = memlist
+        self.parentname = parentname
+
     def __str__(self):
         return "ClassDecl(" + str(self.classname) + (("," + str(self.parentname)) if self.parentname else "") + ",[" + ','.join(str(i) for i in self.memlist) + "])"
 
@@ -234,18 +321,30 @@ class Static(SIKind):
 # In the case of normal method declaration, the name and the return type are from the declaration.
 #@dataclass
 class MethodDecl(MemDecl):
-    kind: SIKind
-    name: Id
-    param: List[VarDecl]
-    returnType: Type  # None for constructor
-    body: Block
+    # kind: SIKind
+    # name: Id
+    # param: List[VarDecl]
+    # returnType: Type  # None for constructor
+    # body: Block
+    def __init__(self,kind:SIKind,name:Id,param:List[VarDecl],body:Block,returnType:Type):
+        self.kind = kind
+        self.name = name
+        self.param = param
+        self.returnType = returnType
+        self.body = body
+
     def __str__(self):
         return "MethodDecl(" + str(self.name) + ',' + str(self.kind) + ",[" +  ','.join(i.toParam() for i in self.param) + "]," + ((str(self.returnType) + ",") if self.returnType else "") + str(self.body) + ")"
+
 # used for mutable (variable) or immutable (constant) declaration
 #@dataclass
 class AttributeDecl(MemDecl):
-    kind: SIKind #Instance or Static
-    decl: Decl # VarDecl for mutable or ConstDecl for immutable
+    # kind: SIKind #Instance or Static
+    # decl: Decl # VarDecl for mutable or ConstDecl for immutable
+    def __init__(self,kind:SIKind,decl: Decl):
+        self.kind = kind
+        self.decl = decl
+
     def __str__(self):
         return "AttributeDecl(" + str(self.kind) + ',' + str(self.decl) + ")"
 
@@ -268,14 +367,21 @@ class StringType(Type):
 
 #@dataclass
 class ArrayType(Type):
-    size : int
-    eleType:Type
+    # size : int
+    # eleType:Type
+    def __init__(self,size:int,eleType:Type):
+        self.size = size
+        self.eleType = eleType
+
     def __str__(self):
         return "ArrayType(" + str(self.size) +  "," + str(self.eleType) + ")"
 
 #@dataclass
 class ClassType(Type):
-    classname:Id
+    # classname:Id
+    def __init__(self,classname:Id):
+        self.classname = classname
+
     def __str__(self):
         return "ClassType(" + str(self.classname)  + ")"
 
@@ -288,6 +394,9 @@ class VoidType(Type):
 # used for whole program
 #@dataclass
 class Program(AST):
-    decl : List[ClassDecl]
+    #decl : List[ClassDecl]
+    def __init__(self,decl:List[ClassDecl]):
+        self.decl = decl
+
     def __str__(self):
         return "Program([" + ','.join(str(i) for i in self.decl) + "])"
