@@ -29,8 +29,8 @@ memberDecl
 // ATTRIBUTE MEMBER
 
 attrDecl
-	: varDecl SIMI
-	| preAttrDecl varDecl SIMI
+	: bkoolType varDecl SIMI
+	| preAttrDecl bkoolType varDecl SIMI
 	; 
 
 preAttrDecl
@@ -41,7 +41,7 @@ preAttrDecl
 	;
 
 varDecl
-	: bkoolType oneVarDecl listVarDecl
+	: oneVarDecl listVarDecl
 	; 
 
 oneVarDecl
@@ -126,8 +126,8 @@ unmatchStmt
 */
 
 varDeclStmt
-	: varDecl SIMI
-	| FINAL varDecl SIMI
+	: bkoolType varDecl SIMI
+	| FINAL bkoolType varDecl SIMI
 	;
 
 assignStmt
@@ -141,7 +141,7 @@ lhs
 	;
 
 ifStmt
-	: IF expr THEN statement (ELSE statement)*
+	: IF expr THEN statement (ELSE statement)?
 	;
 
 forStmt
@@ -150,12 +150,12 @@ forStmt
 	;
 
 funcCallStmt
-	: ID LP listExpr RP SIMI
-	| memAccess DOT ID LP listExpr RP SIMI
+	: memAccess DOT ID LP listExpr RP SIMI
 	; // Method invocation
 
 memAccess
-	: memAccess DOT ID (LP listExpr RP)?
+	: memAccess DOT ID
+	| memAccess DOT ID LP listExpr RP
 	| termObjCreation
 	;
 
@@ -175,33 +175,58 @@ breakStmt
 // EXPRESSION
 
 expr
-	: term0 (LOWER | GREATER | LOWER_E | GREATER_E) term0
+	: term0 compOp term0
 	| term0
 	; // < > <= >=
 
+compOp
+	: LOWER 
+	| GREATER 
+	| LOWER_E 
+	| GREATER_E
+	;
+
 term0
-	: term1 (EQUALS | NOT_EQUALS) term1
+	: term1 qualsOp term1
 	| term1
 	; // == !=
 
+qualsOp
+	: EQUALS 
+	| NOT_EQUALS
+	;
+
 term1
-	: term1 (AND | OR) term2
-	| term2
+	: (term2 andorOp)* term2
 	; // && || @left
-	
+
+andorOp
+	: AND
+	| OR
+	;
+
 term2
-	: term2 (PLUS | MINUS) term3
-	| term3
+	: (term3 addOp)* term3
 	; // + - (binary) @left
 
+addOp
+	: PLUS
+	| MINUS
+	;
+
 term3
-	: term3 (MUL | INT_DIV | FLOAT_DIV | PERCENT) term4
-	| term4
+	: (term4 mulsOp)* term4
 	; //  * / \ & @left
 
+mulsOp
+	: MUL 
+	| INT_DIV 
+	| FLOAT_DIV 
+	| PERCENT
+	;
+
 term4
-	: term4 CONCAT term5
-	| term5
+	: (term5 CONCAT)* term5
 	; // ^ (concat string) @left
 
 term5
@@ -210,9 +235,14 @@ term5
 	; // ! (not) @right
 
 term6
-	: (PLUS | MINUS) term6
+	: signOp term6
 	| termIndexExpr
 	; // + - (unary) @right
+
+signOp
+	: PLUS 
+	| MINUS
+	;
 
 termIndexExpr
 	: indexExpr
@@ -224,7 +254,8 @@ indexExpr
 	;
 
 termMemAccess
-	: termMemAccess DOT ID (LP listExpr RP)?
+	: termMemAccess DOT ID
+	| termMemAccess DOT ID LP listExpr RP
 	| termObjCreation
 	; // Member access @left
 
@@ -235,18 +266,14 @@ termObjCreation
 	
 operands
 	: LP expr RP
-	| funcCallExpr
-	| INT_LIT 
-	| FLOAT_LIT 
-	| BOOL_LIT
-	| STRING_LIT
+	| primLit
 	| NIL
 	| THIS
 	| ID
 	;
 
 funcCallExpr
-	: ID LP listExpr RP
+	: termMemAccess DOT ID LP listExpr RP
 	; 
 
 listExpr
@@ -304,7 +331,6 @@ literal
 
 arrayType
 	: PRIMITIVE LSB INT_LIT RSB
-	| ID LSB INT_LIT RSB
 	;
 
 bkoolType
