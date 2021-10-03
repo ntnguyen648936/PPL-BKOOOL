@@ -40,9 +40,9 @@ class ASTGeneration(BKOOLVisitor):
     def visitClassDecl(self, ctx: BKOOLParser.ClassDeclContext):
         parent = Id(ctx.ID(1).getText()) if ctx.ID(1) else None
         return ClassDecl(
-            classname=Id(ctx.ID(0).getText()),
-            memlist=flatten([self.visit(x) for x in ctx.memberDecl()]),
-            parentname=parent
+            Id(ctx.ID(0).getText()),
+            flatten([self.visit(x) for x in ctx.memberDecl()]),
+            parent
         )
 
     def visitMemberDecl(self, ctx: BKOOLParser.MemberDeclContext):
@@ -65,20 +65,20 @@ class ASTGeneration(BKOOLVisitor):
 
         if _final:
             return [AttributeDecl(
-                    kind=kind,
-                    decl=ConstDecl(
-                        constant=_name,
-                        constType=_bkoolType,
-                        value=_init,
+                    kind,
+                    ConstDecl(
+                        _name,
+                        _bkoolType,
+                        _init,
                     )
                     ) for _name, _init in decls]
 
         return [AttributeDecl(
-            kind=kind,
-            decl=VarDecl(
-                variable=_name,
-                varType=_bkoolType,
-                varInit=_init,
+            kind,
+            VarDecl(
+                _name,
+                _bkoolType,
+                _init,
             )
         ) for _name, _init in decls]
 
@@ -89,12 +89,14 @@ class ASTGeneration(BKOOLVisitor):
 
         _methodName = ctx.ID().getText()
         _static, _type = self.visit(
-            preMethodDeclContext) if preMethodDeclContext else (None, None)
+            preMethodDeclContext
+            ) if preMethodDeclContext else (None, None)
 
         kind = Static() if _static else Instance()
         name = Id(_methodName if _type else "<init>")
-        param = flatten(self.visit(paramDeclContext)
-                        ) if paramDeclContext else []
+        param = flatten(
+                self.visit(paramDeclContext)
+            ) if paramDeclContext else []
         body = self.visit(ctx.blockStmt())
         returnType = _type
 
@@ -104,11 +106,12 @@ class ASTGeneration(BKOOLVisitor):
             returnType = VoidType()
 
         return MethodDecl(
-            kind=kind,
-            name=name,
-            param=param,
-            body=body,
-            returnType=returnType)
+            kind,
+            name,
+            param,
+            returnType,
+            body
+        )
 
     def visitBlockStmt(self, ctx: BKOOLParser.BlockStmtContext):
 
@@ -116,16 +119,16 @@ class ASTGeneration(BKOOLVisitor):
         listStatementContext = ctx.statement()
 
         return Block(
-            decl=flatten([self.visit(i) for i in listVarDeclsContext]) 
+            flatten([self.visit(i) for i in listVarDeclsContext]) 
                 if listVarDeclsContext else [],
-            stmt=flatten([self.visit(i) for i in listStatementContext]) 
+            flatten([self.visit(i) for i in listStatementContext]) 
                 if listStatementContext else []
         )
 
     def visitArrayType(self, ctx: BKOOLParser.ArrayTypeContext):
         return ArrayType(
-            eleType=str_to_primitive(ctx.PRIMITIVE().getText()),
-            size=int(ctx.INT_LIT().getText())
+            int(ctx.INT_LIT().getText()),
+            str_to_primitive(ctx.PRIMITIVE().getText())
         )
 
     #
@@ -160,8 +163,8 @@ class ASTGeneration(BKOOLVisitor):
 
     def visitListID(self, ctx: BKOOLParser.ListIDContext):
         listIdContext = ctx.listID()
-        return ([Id(ctx.ID().getText())] +
-                self.visit(listIdContext)) if listIdContext else []
+        return ([Id(ctx.ID().getText())] + \
+            self.visit(listIdContext)) if listIdContext else []
 
     def visitOneVarDecl(self, ctx: BKOOLParser.OneVarDeclContext):
         declAssignmentContext = ctx.declAssignment()
@@ -190,7 +193,7 @@ class ASTGeneration(BKOOLVisitor):
     def visitArrayLit(self, ctx: BKOOLParser.ArrayLitContext):
         listOfPrimLitContext = ctx.listOfPrimLit()
         return ArrayLiteral(
-            [self.visit(ctx.primLit())] +
+            [self.visit(ctx.primLit())] + \
             (self.visit(listOfPrimLitContext) if listOfPrimLitContext else [])
         )
 
@@ -207,8 +210,8 @@ class ASTGeneration(BKOOLVisitor):
         termMemAccessContext = ctx.termMemAccess()
         if termMemAccessContext:
             return FieldAccess(
-                obj=self.visit(termMemAccessContext),
-                fieldname=Id(ctx.ID().getText())
+                self.visit(termMemAccessContext),
+                Id(ctx.ID().getText())
             )
 
         return Id(ctx.ID().getText()) 
@@ -222,14 +225,15 @@ class ASTGeneration(BKOOLVisitor):
         listExprContext = ctx.listExpr()
         if listExprContext:
             return CallExpr(
-                obj=self.visit(ctx.memAccess()),
-                method=Id(ctx.ID().getText()),
-                param=self.visit(listExprContext)
+                self.visit(ctx.memAccess()),
+                Id(ctx.ID().getText()),
+                self.visit(listExprContext)
             )
 
         return FieldAccess(
-            obj=self.visit(ctx.memAccess()),
-            fieldname=Id(ctx.ID().getText()))
+            self.visit(ctx.memAccess()),
+            Id(ctx.ID().getText())
+        )
 
     #
     # Statements
@@ -242,47 +246,47 @@ class ASTGeneration(BKOOLVisitor):
 
         if _final:
             return [ConstDecl(
-                        constant=_name,
-                        constType=_bkoolType,
-                        value=_init,
+                        _name,
+                        _bkoolType,
+                        _init,
                     ) for _name, _init in _varDecls]
 
         return [VarDecl(
-                variable=_name,
-                varType=_bkoolType,
-                varInit=_init,
+                _name,
+                _bkoolType,
+                _init,
             ) for _name, _init in _varDecls]
 
     def visitAssignStmt(self, ctx: BKOOLParser.AssignStmtContext):
         return Assign(
-            lhs=self.visit(ctx.lhs()),
-            exp=self.visit(ctx.expr())
+            self.visit(ctx.lhs()),
+            self.visit(ctx.expr())
         )
 
     def visitIfStmt(self, ctx: BKOOLParser.IfStmtContext):
         statementContext = ctx.statement()
         return If(
-            expr=self.visit(ctx.expr()),
-            thenStmt=self.visit(statementContext[0]),
-            elseStmt=self.visit(statementContext[1]) 
+            self.visit(ctx.expr()),
+            self.visit(statementContext[0]),
+            self.visit(statementContext[1]) \
                 if len(statementContext) == 2 else None
         )
 
     def visitForStmt(self, ctx: BKOOLParser.ForStmtContext):
         exprContext = ctx.expr()
         return For(
-            id=Id(ctx.ID().getText()),
-            expr1=self.visit(exprContext[0]),
-            expr2=self.visit(exprContext[1]),
-            up=ctx.TO()!=None,
-            loop=self.visit(ctx.statement())
+            Id(ctx.ID().getText()),
+            self.visit(exprContext[0]),
+            self.visit(exprContext[1]),
+            ctx.TO()!=None,
+            self.visit(ctx.statement())
         )
 
     def visitFuncCallStmt(self, ctx: BKOOLParser.FuncCallStmtContext):
         return CallStmt(
-            obj=self.visit(ctx.memAccess()),
-            method=Id(ctx.ID().getText()),
-            param=self.visit(ctx.listExpr())
+            self.visit(ctx.memAccess()),
+            Id(ctx.ID().getText()),
+            self.visit(ctx.listExpr())
         )
 
     def visitReturnStmt(self, ctx: BKOOLParser.ReturnStmtContext):
@@ -302,9 +306,9 @@ class ASTGeneration(BKOOLVisitor):
         if len(term0Context) == 1:
             return self.visit(term0Context[0])
         return BinaryOp(
-            op=ctx.compOp().getText(),
-            left=self.visit(term0Context[0]),
-            right=self.visit(term0Context[1])
+            ctx.compOp().getText(),
+            self.visit(term0Context[0]),
+            self.visit(term0Context[1])
         )
 
     def visitTerm0(self, ctx: BKOOLParser.Term0Context):
@@ -313,9 +317,9 @@ class ASTGeneration(BKOOLVisitor):
             return self.visit(term1Context[0])
 
         return BinaryOp(
-            op=ctx.qualsOp().getText(),
-            left=self.visit(term1Context[0]),
-            right=self.visit(term1Context[1])
+            ctx.qualsOp().getText(),
+            self.visit(term1Context[0]),
+            self.visit(term1Context[1])
         )
 
     def visitTerm1(self, ctx: BKOOLParser.Term1Context):
@@ -367,14 +371,20 @@ class ASTGeneration(BKOOLVisitor):
         if term6Context:
             return self.visit(term6Context)
 
-        return UnaryOp(ctx.NOT().getText(), self.visit(ctx.term5()))
+        return UnaryOp(
+            ctx.NOT().getText(), 
+            self.visit(ctx.term5())
+        )
 
     def visitTerm6(self, ctx: BKOOLParser.Term6Context):
         termIndexExprContext = ctx.termIndexExpr()
         if termIndexExprContext:
             return self.visit(termIndexExprContext)
 
-        return UnaryOp(ctx.signOp().getText(), self.visit(ctx.term6()))
+        return UnaryOp(
+            ctx.signOp().getText(),
+            self.visit(ctx.term6())
+        )
 
     def visitTermIndexExpr(self, ctx: BKOOLParser.TermIndexExprContext):
         termMemAccessContext = ctx.termMemAccess()
@@ -384,7 +394,10 @@ class ASTGeneration(BKOOLVisitor):
         return self.visit(ctx.indexExpr())
 
     def visitIndexExpr(self, ctx: BKOOLParser.IndexExprContext):
-        return ArrayCell(self.visit(ctx.termMemAccess()), self.visit(ctx.expr()))
+        return ArrayCell(
+            self.visit(ctx.termMemAccess()), 
+            self.visit(ctx.expr())
+        )
 
     def visitTermMemAccess(self, ctx: BKOOLParser.TermMemAccessContext):
         termObjCreationContext = ctx.termObjCreation()
@@ -394,14 +407,15 @@ class ASTGeneration(BKOOLVisitor):
         listExprContext = ctx.listExpr()
         if listExprContext:
             return CallExpr(
-                obj=self.visit(ctx.termMemAccess()),
-                method=Id(ctx.ID().getText()),
-                param=self.visit(listExprContext)
+                self.visit(ctx.termMemAccess()),
+                Id(ctx.ID().getText()),
+                self.visit(listExprContext)
             )
 
         return FieldAccess(
-            obj=self.visit(ctx.termMemAccess()),
-            fieldname=Id(ctx.ID().getText()))
+            self.visit(ctx.termMemAccess()),
+            Id(ctx.ID().getText())
+        )
 
     def visitTermObjCreation(self, ctx: BKOOLParser.TermObjCreationContext):
         operandsContext = ctx.operands()
@@ -409,15 +423,15 @@ class ASTGeneration(BKOOLVisitor):
             return self.visit(operandsContext)
 
         return NewExpr(
-            classname=Id(ctx.ID().getText()),
-            param=self.visit(ctx.listExpr())
+            Id(ctx.ID().getText()),
+            self.visit(ctx.listExpr())
         )
 
     def visitFuncCallExpr(self, ctx: BKOOLParser.FuncCallExprContext):
         return CallExpr(
-            obj=self.visit(ctx.termMemAccess()),
-            method=Id(ctx.ID().getText()),
-            param=self.visit(ctx.listExpr()) if ctx.listExpr() else []
+            self.visit(ctx.termMemAccess()),
+            Id(ctx.ID().getText()),
+            self.visit(ctx.listExpr()) if ctx.listExpr() else []
         )
 
     def visitListExpr(self, ctx: BKOOLParser.ListExprContext):
