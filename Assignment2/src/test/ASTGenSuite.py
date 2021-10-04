@@ -1,3 +1,4 @@
+from typing import Callable
 import unittest
 from TestUtils import TestAST
 from AST import *
@@ -695,7 +696,8 @@ class ASTGenSuite(unittest.TestCase):
                         name=Id("foo"),
                         param=[],
                         returnType=VoidType(),
-                        body=Block([VarDecl(Id("a"),IntType(),IntLiteral(0))], [Block([], [])]),
+                        body=Block([VarDecl(Id("a"), IntType(), IntLiteral(0))], [
+                                   Block([], [])]),
                     )
                 ]
             )
@@ -724,12 +726,12 @@ class ASTGenSuite(unittest.TestCase):
                         returnType=VoidType(),
                         body=Block(
                             [
-                                VarDecl(Id("a"),IntType(),IntLiteral(0)),
-                                VarDecl(Id("b"),IntType()),
+                                VarDecl(Id("a"), IntType(), IntLiteral(0)),
+                                VarDecl(Id("b"), IntType()),
                                 ConstDecl(
                                     Id("s"),
                                     ClassType(Id("Shape")),
-                                    NewExpr(Id("Shape"),[Id("a")])
+                                    NewExpr(Id("Shape"), [Id("a")])
                                 ),
                                 VarDecl(
                                     Id("r"),
@@ -737,10 +739,11 @@ class ASTGenSuite(unittest.TestCase):
                                 ),
                                 ConstDecl(
                                     Id("arr"),
-                                    ArrayType(2,BoolType()),
-                                    ArrayLiteral([BooleanLiteral(True), BooleanLiteral(False)])
+                                    ArrayType(2, BoolType()),
+                                    ArrayLiteral(
+                                        [BooleanLiteral(True), BooleanLiteral(False)])
                                 ),
-                            ], 
+                            ],
                             []
                         ),
                     )
@@ -772,13 +775,13 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=VoidType(),
                         body=Block(
-                            [VarDecl(Id("a"), IntType())], 
+                            [VarDecl(Id("a"), IntType())],
                             [
                                 Block(
-                                    [VarDecl(Id("b"), StringType())], 
-                                    [Assign(Id("a"),IntLiteral(0))]
+                                    [VarDecl(Id("b"), StringType())],
+                                    [Assign(Id("a"), IntLiteral(0))]
                                 ),
-                                Assign(Id("b"),StringLiteral("hello"))
+                                Assign(Id("b"), StringLiteral("hello"))
                             ]
                         ),
                     )
@@ -813,34 +816,35 @@ class ASTGenSuite(unittest.TestCase):
                         returnType=VoidType(),
                         body=Block(
                             [
-                                VarDecl(Id("a"),IntType(),IntLiteral(0)),
-                                VarDecl(Id("b"),IntType()),
+                                VarDecl(Id("a"), IntType(), IntLiteral(0)),
+                                VarDecl(Id("b"), IntType()),
                                 ConstDecl(
                                     Id("s"),
                                     ClassType(Id("Shape")),
-                                    NewExpr(Id("Shape"),[Id("a")])
-                                )                               
-                            ], 
+                                    NewExpr(Id("Shape"), [Id("a")])
+                                )
+                            ],
                             [
                                 Block([
-                                     VarDecl(
+                                    VarDecl(
                                         Id("r1"),
-                                        ClassType(Id("Rect"))                                       
+                                        ClassType(Id("Rect"))
                                     ),
                                     VarDecl(
                                         Id("r2"),
                                         ClassType(Id("Rect")),
                                         NewExpr(
                                             Id("Rect"),
-                                            [IntLiteral(1),IntLiteral(2)]
+                                            [IntLiteral(1), IntLiteral(2)]
                                         )
                                     )
-                                ],[
+                                ], [
                                     Block([
                                         ConstDecl(
                                             Id("arr"),
-                                            ArrayType(2,BoolType()),
-                                            ArrayLiteral([BooleanLiteral(True), BooleanLiteral(False)])
+                                            ArrayType(2, BoolType()),
+                                            ArrayLiteral(
+                                                [BooleanLiteral(True), BooleanLiteral(False)])
                                         )
                                     ], [])
                                 ])
@@ -852,7 +856,7 @@ class ASTGenSuite(unittest.TestCase):
         ]))
         self.assertTrue(TestAST.test(input, expect, 330))
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
 
     def test_expression_01(self):
         input = r"""
@@ -1898,7 +1902,7 @@ class ASTGenSuite(unittest.TestCase):
                                         param=[Id("b")]
                                     ),
                                     fieldname=Id("c")
-                                ), 
+                                ),
                                 method=Id("d"),
                                 param=[]
                             )
@@ -1941,7 +1945,6 @@ class ASTGenSuite(unittest.TestCase):
             )
         ]))
         self.assertTrue(TestAST.test(input, expect, 362))
-
 
     def test_expression_33(self):
         input = r"""
@@ -2028,8 +2031,8 @@ class ASTGenSuite(unittest.TestCase):
             )
         ]))
         self.assertTrue(TestAST.test(input, expect, 364))
-    
-    def test_expression_34(self):
+
+    def test_expression_35(self):
         input = r"""
         class main {
             int a = b==!c<=d+e*f^g;
@@ -2049,7 +2052,7 @@ class ASTGenSuite(unittest.TestCase):
                                 left=BinaryOp(
                                     op="==",
                                     left=Id("b"),
-                                    right=UnaryOp("!",Id("c"))
+                                    right=UnaryOp("!", Id("c"))
                                 ),
                                 right=BinaryOp(
                                     op="+",
@@ -2070,9 +2073,9 @@ class ASTGenSuite(unittest.TestCase):
                 ]
             )
         ]))
-        self.assertTrue(TestAST.test(input, expect, 364))
+        self.assertTrue(TestAST.test(input, expect, 365))
 
-    def test_expression_35(self):
+    def test_expression_36(self):
         input = r"""
         class main {
             int a = b==c>d!=!e[new F().g];
@@ -2102,19 +2105,221 @@ class ASTGenSuite(unittest.TestCase):
                                         ArrayCell(
                                             arr=Id("e"),
                                             idx=FieldAccess(
-                                                obj=NewExpr(Id("F"),[]),
+                                                obj=NewExpr(Id("F"), []),
                                                 fieldname=Id("g")
                                             )
                                         )
                                     )
                                 )
-                            ) 
+                            )
                         )
                     )
                 ]
             )
         ]))
-        self.assertTrue(TestAST.test(input, expect, 365))
+        self.assertTrue(TestAST.test(input, expect, 366))
+
+    def test_expression_37(self):
+        input = r"""
+        class main {
+            boolean a = b + new c("hello").d && e.f[g==h.i*2.0] || k;
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(
+                            variable=Id("a"),
+                            varType=BoolType(),
+                            varInit=BinaryOp(
+                                op="||",
+                                left=BinaryOp(
+                                    op="&&",
+                                    left=BinaryOp(
+                                        "+",
+                                        Id("b"),
+                                        FieldAccess(
+                                            NewExpr(
+                                                Id("c"), [StringLiteral("hello")]),
+                                            Id("d")
+                                        )
+                                    ),
+                                    right=ArrayCell(
+                                        FieldAccess(Id("e"), Id("f")),
+                                        BinaryOp(
+                                            "==",
+                                            Id("g"),
+                                            BinaryOp(
+                                                "*",
+                                                FieldAccess(Id("h"), Id("i")),
+                                                FloatLiteral(2.0)
+                                            )
+                                        )
+                                    )
+                                ),
+                                right=Id("k")
+                            )
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 367))
+
+    def test_expression_38(self):
+        input = r"""
+        class main {
+            int a = (new b().c[0] + new d()).e.f("hello"^"world");
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(
+                            variable=Id("a"),
+                            varType=IntType(),
+                            varInit=CallExpr(
+                                FieldAccess(
+                                    BinaryOp(
+                                        "+",
+                                        ArrayCell(
+                                            FieldAccess(
+                                                NewExpr(Id("b"), []),
+                                                Id("c")
+                                            ),
+                                            IntLiteral(0)
+                                        ),
+                                        NewExpr(Id("d"), [])
+                                    ),
+                                    Id("e")
+                                ),
+                                Id("f"),
+                                [BinaryOp("^", StringLiteral("hello"),
+                                          StringLiteral("world"))]
+                            )
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 368))
+
+    def test_expression_39(self):
+        input = r"""
+        class main {
+            int a = this.b(11 % 22 + -33,new c(true,d && f)[44],g.h(i)[55]^k);
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(
+                            variable=Id("a"),
+                            varType=IntType(),
+                            varInit=CallExpr(
+                                SelfLiteral(),
+                                Id("b"),
+                                [
+                                    BinaryOp(
+                                        "+",
+                                        BinaryOp("%", IntLiteral(
+                                            11), IntLiteral(22)),
+                                        UnaryOp("-", IntLiteral(33))
+                                    ),
+                                    ArrayCell(
+                                        NewExpr(
+                                            Id("c"),
+                                            [
+                                                BooleanLiteral(True),
+                                                BinaryOp(
+                                                    "&&", Id("d"), Id("f"))
+                                            ]
+                                        ),
+                                        IntLiteral(44)
+                                    ),
+                                    BinaryOp(
+                                        "^",
+                                        ArrayCell(
+                                            CallExpr(Id("g"), Id(
+                                                "h"), [Id("i")]),
+                                            IntLiteral(55)
+                                        ),
+                                        Id("k")
+                                    )
+                                ]
+                            )
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 369))
+
+    def test_expression_40(self):
+        input = r"""
+        class main {
+            int a = !new A(+new b()[new c().d] \ 1 + (-new e()).f.g);
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(
+                            variable=Id("a"),
+                            varType=IntType(),
+                            varInit=UnaryOp(
+                                "!",
+                                NewExpr(
+                                    Id("A"),
+                                    [BinaryOp(
+                                        "+",
+                                        BinaryOp(
+                                            "\\",
+                                            UnaryOp(
+                                                "+",
+                                                ArrayCell(
+                                                    NewExpr(Id("b"), []),
+                                                    FieldAccess(
+                                                        NewExpr(Id("c"), []),
+                                                        Id("d")
+                                                    )
+                                                )
+                                            ),
+                                            IntLiteral(1)
+                                        ),
+                                        FieldAccess(
+                                            FieldAccess(
+                                                UnaryOp(
+                                                    "-",
+                                                    NewExpr(Id("e"), [])
+                                                ),
+                                                Id("f")
+                                            ),
+                                            Id("g")
+                                        )
+                                    )]
+                                )
+                            )
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 370))
+
+    # ------------------------------------------------------------------------
 
     def test_statement_01(self):
         input = r"""
@@ -2135,8 +2340,8 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=VoidType(),
                         body=Block(
-                            [VarDecl(Id("a"),IntType())], 
-                            [Assign(Id("a"),IntLiteral(0))]
+                            [VarDecl(Id("a"), IntType())],
+                            [Assign(Id("a"), IntLiteral(0))]
                         )
                     )
                 ]
@@ -2163,15 +2368,14 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=VoidType(),
                         body=Block(
-                            [VarDecl(Id("a"),IntType(),IntLiteral(0))], 
-                            [If(Id("a"),Assign(Id("a"),IntLiteral(1)))]
+                            [VarDecl(Id("a"), IntType(), IntLiteral(0))],
+                            [If(Id("a"), Assign(Id("a"), IntLiteral(1)))]
                         )
                     )
                 ]
             )
         ]))
         self.assertTrue(TestAST.test(input, expect, 372))
-
 
     def test_statement_03(self):
         input = r"""
@@ -2192,11 +2396,11 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=VoidType(),
                         body=Block(
-                            [VarDecl(Id("a"),IntType(),IntLiteral(0))], 
+                            [VarDecl(Id("a"), IntType(), IntLiteral(0))],
                             [If(
-                                expr=BinaryOp("==",Id("a"),IntLiteral(0)),
-                                thenStmt=Assign(Id("a"),IntLiteral(1)),
-                                elseStmt=Assign(Id("a"),IntLiteral(2)))]
+                                expr=BinaryOp("==", Id("a"), IntLiteral(0)),
+                                thenStmt=Assign(Id("a"), IntLiteral(1)),
+                                elseStmt=Assign(Id("a"), IntLiteral(2)))]
                         )
                     )
                 ]
@@ -2223,13 +2427,13 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=VoidType(),
                         body=Block(
-                            [VarDecl(Id("a"),IntType(),IntLiteral(0))], 
+                            [VarDecl(Id("a"), IntType(), IntLiteral(0))],
                             [If(
-                                expr=BinaryOp("==",Id("a"),IntLiteral(0)),
+                                expr=BinaryOp("==", Id("a"), IntLiteral(0)),
                                 thenStmt=If(
                                     expr=Id("b"),
-                                    thenStmt=Assign(Id("a"),IntLiteral(1)),
-                                    elseStmt=Assign(Id("a"),IntLiteral(2))),
+                                    thenStmt=Assign(Id("a"), IntLiteral(1)),
+                                    elseStmt=Assign(Id("a"), IntLiteral(2))),
                                 elseStmt=None
                             )]
                         )
@@ -2258,17 +2462,18 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=VoidType(),
                         body=Block(
-                            [VarDecl(Id("a"),IntType(),IntLiteral(0))], 
+                            [VarDecl(Id("a"), IntType(), IntLiteral(0))],
                             [If(
-                                expr=BinaryOp("==",Id("a"),IntLiteral(0)),
+                                expr=BinaryOp("==", Id("a"), IntLiteral(0)),
                                 thenStmt=Block([], [
                                     If(
                                         expr=Id("b"),
-                                        thenStmt=Assign(Id("a"),IntLiteral(1)),
+                                        thenStmt=Assign(
+                                            Id("a"), IntLiteral(1)),
                                         elseStmt=None
                                     )
                                 ]),
-                                elseStmt=Assign(Id("a"),IntLiteral(2))
+                                elseStmt=Assign(Id("a"), IntLiteral(2))
                             )]
                         )
                     )
@@ -2296,21 +2501,23 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=VoidType(),
                         body=Block(
-                            [VarDecl(Id("a"),IntType(),IntLiteral(0))], 
+                            [VarDecl(Id("a"), IntType(), IntLiteral(0))],
                             [If(
-                                expr=BinaryOp("==",Id("a"),IntLiteral(0)),
+                                expr=BinaryOp("==", Id("a"), IntLiteral(0)),
                                 thenStmt=Block(
                                     [
-                                        ConstDecl(Id("b"),BoolType(),BooleanLiteral(True)),
-                                    ], 
+                                        ConstDecl(Id("b"), BoolType(),
+                                                  BooleanLiteral(True)),
+                                    ],
                                     [
                                         If(
                                             expr=Id("b"),
-                                            thenStmt=Assign(Id("a"),IntLiteral(1)),
+                                            thenStmt=Assign(
+                                                Id("a"), IntLiteral(1)),
                                             elseStmt=None
                                         )
                                     ]),
-                                elseStmt=Assign(Id("a"),IntLiteral(2))
+                                elseStmt=Assign(Id("a"), IntLiteral(2))
                             )]
                         )
                     )
@@ -2337,7 +2544,7 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [Return(IntLiteral(1))]
                         )
                     )
@@ -2364,7 +2571,7 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [Return(BinaryOp(
                                 op="+",
                                 left=BinaryOp(
@@ -2380,7 +2587,8 @@ class ASTGenSuite(unittest.TestCase):
                                     ),
                                     right=IntLiteral(3)
                                 ),
-                                right=BinaryOp("*",IntLiteral(4),IntLiteral(5))
+                                right=BinaryOp(
+                                    "*", IntLiteral(4), IntLiteral(5))
                             ))]
                         )
                     )
@@ -2408,10 +2616,10 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [
                                 Return(IntLiteral(1)),
-                                Assign(Id("a"),IntLiteral(0))
+                                Assign(Id("a"), IntLiteral(0))
                             ]
                         )
                     )
@@ -2438,7 +2646,7 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [
                                 Break()
                             ]
@@ -2448,7 +2656,6 @@ class ASTGenSuite(unittest.TestCase):
             )
         ]))
         self.assertTrue(TestAST.test(input, expect, 379))
-
 
     def test_statement_10(self):
         input = r"""
@@ -2468,7 +2675,7 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [
                                 Continue()
                             ]
@@ -2478,7 +2685,6 @@ class ASTGenSuite(unittest.TestCase):
             )
         ]))
         self.assertTrue(TestAST.test(input, expect, 380))
-
 
     def test_statement_11(self):
         input = r"""
@@ -2498,13 +2704,13 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [
                                 For(
                                     Id("i"),
-                                    IntLiteral(1), 
-                                    IntLiteral(2), 
-                                    True, 
+                                    IntLiteral(1),
+                                    IntLiteral(2),
+                                    True,
                                     Break()
                                 )
                             ]
@@ -2533,19 +2739,19 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [
                                 For(
                                     Id("i"),
-                                    IntLiteral(1), 
-                                    IntLiteral(2), 
-                                    True, 
+                                    IntLiteral(1),
+                                    IntLiteral(2),
+                                    True,
                                     For(
                                         Id("j"),
-                                        IntLiteral(3), 
-                                        IntLiteral(4), 
+                                        IntLiteral(3),
+                                        IntLiteral(4),
                                         False,
-                                        Continue() 
+                                        Continue()
                                     )
                                 )
                             ]
@@ -2577,28 +2783,28 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [
                                 For(
                                     Id("i"),
-                                    IntLiteral(1), 
-                                    IntLiteral(2), 
-                                    True, 
+                                    IntLiteral(1),
+                                    IntLiteral(2),
+                                    True,
                                     Block(
                                         [
                                             ConstDecl(
                                                 Id("s"),
-                                                StringType(), 
+                                                StringType(),
                                                 StringLiteral("hello")
                                             )
                                         ],
                                         [
                                             For(
                                                 Id("j"),
-                                                IntLiteral(3), 
-                                                IntLiteral(4), 
+                                                IntLiteral(3),
+                                                IntLiteral(4),
                                                 False,
-                                                Continue() 
+                                                Continue()
                                             )
                                         ]
                                     )
@@ -2635,28 +2841,32 @@ class ASTGenSuite(unittest.TestCase):
                         param=[],
                         returnType=IntType(),
                         body=Block(
-                            [], 
+                            [],
                             [
                                 For(
                                     Id("i"),
-                                    IntLiteral(1), 
-                                    IntLiteral(2), 
-                                    True, 
+                                    IntLiteral(1),
+                                    IntLiteral(2),
+                                    True,
                                     Block(
-                                        [VarDecl(Id("a"), IntType(), IntLiteral(0))],
+                                        [VarDecl(Id("a"), IntType(),
+                                                 IntLiteral(0))],
                                         [
-                                            Block([],[
+                                            Block([], [
                                                 If(
-                                                    expr=BinaryOp("==",Id("i"),IntLiteral(1)),
+                                                    expr=BinaryOp(
+                                                        "==", Id("i"), IntLiteral(1)),
                                                     thenStmt=If(
-                                                        BinaryOp("==",Id("a"),IntLiteral(0)),
+                                                        BinaryOp(
+                                                            "==", Id("a"), IntLiteral(0)),
                                                         Break(),
                                                         Continue()
                                                     )
                                                 )
                                             ]),
                                             If(
-                                                expr=BinaryOp(">",Id("i"),Id("a")),
+                                                expr=BinaryOp(
+                                                    ">", Id("i"), Id("a")),
                                                 thenStmt=Return(Id("i"))
                                             )
                                         ]
@@ -2668,4 +2878,883 @@ class ASTGenSuite(unittest.TestCase):
                 ]
             )
         ]))
-        self.assertTrue(TestAST.test(input, expect, 383))
+        self.assertTrue(TestAST.test(input, expect, 384))
+
+    def test_statement_15(self):
+        input = r"""
+        class main {
+            int foo() {
+                this.foo("hello").a := new B("world");
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[],
+                        returnType=IntType(),
+                        body=Block(
+                            [],
+                            [Assign(
+                                FieldAccess(
+                                    CallExpr(SelfLiteral(), Id("foo"),
+                                             [StringLiteral("hello")]),
+                                    Id("a")
+                                ),
+                                NewExpr(Id("B"), [StringLiteral("world")])
+                            )]
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 385))
+
+    def test_statement_16(self):
+        input = r"""
+        class main {
+            int foo(string s) {
+                this.a[this.foo("hello")] := new B("world");
+                return 1;
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[VarDecl(Id("s"), StringType())],
+                        returnType=IntType(),
+                        body=Block(
+                            [],
+                            [Assign(
+                                ArrayCell(
+                                    FieldAccess(
+                                        SelfLiteral(),
+                                        Id("a")
+                                    ),
+                                    CallExpr(SelfLiteral(), Id("foo"),
+                                             [StringLiteral("hello")])
+                                ),
+                                NewExpr(Id("B"), [StringLiteral("world")])
+                            ), Return(IntLiteral(1))]
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 386))
+
+    def test_statement_17(self):
+        input = r"""
+        class main {
+            int foo(string s) {
+                this.yoo(a).b[this.foo("hello")] := new C("world");
+                return 1;
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[VarDecl(Id("s"), StringType())],
+                        returnType=IntType(),
+                        body=Block(
+                            [],
+                            [Assign(
+                                ArrayCell(
+                                    FieldAccess(
+                                        CallExpr(SelfLiteral(), Id(
+                                            "yoo"), [Id("a")]),
+                                        Id("b")
+                                    ),
+                                    CallExpr(SelfLiteral(), Id("foo"),
+                                             [StringLiteral("hello")])
+                                ),
+                                NewExpr(Id("C"), [StringLiteral("world")])
+                            ), Return(IntLiteral(1))]
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 387))
+
+    def test_statement_18(self):
+        input = r"""
+        class main {
+            int foo(string s) {
+                this.yoo(a)[this.foo("hello")] := new B("world");
+                return 1;
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[VarDecl(Id("s"), StringType())],
+                        returnType=IntType(),
+                        body=Block(
+                            [],
+                            [Assign(
+                                ArrayCell(
+                                    CallExpr(SelfLiteral(), Id(
+                                        "yoo"), [Id("a")]),
+                                    CallExpr(
+                                        SelfLiteral(),
+                                        Id("foo"),
+                                        [StringLiteral("hello")]
+                                    )
+                                ),
+                                NewExpr(Id("B"), [StringLiteral("world")])
+                            ), Return(IntLiteral(1))]
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 388))
+
+    def test_statement_19(self):
+        input = r"""
+        class main {
+            int foo() {
+                {
+                    (this.foo("hello").x + new A("world")).b := c.d(e)[f];
+                }
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[],
+                        returnType=IntType(),
+                        body=Block(
+                            [],
+                            [Block([], [
+                                Assign(
+                                    FieldAccess(
+                                        BinaryOp(
+                                            "+",
+                                            FieldAccess(
+                                                CallExpr(
+                                                    SelfLiteral(),
+                                                    Id("foo"),
+                                                    [StringLiteral("hello")]
+                                                ),
+                                                Id("x")
+                                            ),
+                                            NewExpr(
+                                                Id("A"), [StringLiteral("world")])
+                                        ),
+                                        Id("b")
+                                    ),
+                                    ArrayCell(
+                                        CallExpr(Id("c"), Id("d"), [Id("e")]), Id("f"))
+                                )
+                            ])]
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 389))
+
+    def test_statement_20(self):
+        input = r"""
+        class main {
+            int[3] foo() {
+                {
+                    final int[3] a = {1,2,3};
+                    return a;
+                }
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[],
+                        returnType=ArrayType(3, IntType()),
+                        body=Block(
+                            [],
+                            [Block([
+                                ConstDecl(
+                                    Id("a"),
+                                    ArrayType(3, IntType()),
+                                    ArrayLiteral([
+                                        IntLiteral(1),
+                                        IntLiteral(2),
+                                        IntLiteral(3)
+                                    ])
+                                )
+                            ], [
+                                Return(Id("a"))
+                            ])]
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 390))
+
+    def test_statement_21(self):
+        input = r"""
+        class main {
+            static int[3] main() {
+                {
+                    return a;
+                }
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("main"),
+                [
+                    MethodDecl(
+                        kind=Static(),
+                        name=Id("main"),
+                        param=[],
+                        returnType=VoidType(),
+                        body=Block(
+                            [],
+                            [Block([], [
+
+                                Return(Id("a"))
+                            ])]
+                        )
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 391))
+
+    def test_statement_22(self):
+        input = r"""
+        class Shape {
+            A(float[2] a,b;string c) {}
+            B(int a) { {{{a:=1;}}} {} }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("Shape"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("<init>"),
+                        param=[
+                            VarDecl(Id("a"), ArrayType(2, FloatType())),
+                            VarDecl(Id("b"), ArrayType(2, FloatType())),
+                            VarDecl(Id("c"), StringType())
+                        ],
+                        returnType=None,
+                        body=Block(
+                            [], []
+                        )
+                    ),
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("<init>"),
+                        param=[VarDecl(Id("a"), IntType())],
+                        returnType=None,
+                        body=Block([], [
+                            Block([], [
+                                Block([], [
+                                    Block([], [Assign(Id("a"), IntLiteral(1))])
+                                ])]
+                            ),
+                            Block([], [])
+                        ])
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 392))
+
+    def test_statement_23(self):
+        input = r"""
+        class Shape {
+            void foo() {
+                this.a();
+                b.c();
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("Shape"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[],
+                        returnType=VoidType(),
+                        body=Block(
+                            [], [
+                                CallStmt(SelfLiteral(), Id("a"), []),
+                                CallStmt(Id("b"), Id("c"), [])
+                            ]
+                        )
+                    ),
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 393))
+
+    def test_statement_24(self):
+        input = r"""
+        class Shape {
+            void foo() {
+                this.foo().a(b.c() + this.d - 2, e[0]);
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("Shape"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("foo"),
+                        param=[],
+                        returnType=VoidType(),
+                        body=Block(
+                            [], [
+                                CallStmt(CallExpr(
+                                    SelfLiteral(), Id("foo"), []
+                                ), Id("a"), [
+                                    BinaryOp(
+                                        "-",
+                                        BinaryOp(
+                                            "+",
+                                            CallExpr(Id("b"), Id("c"), []),
+                                            FieldAccess(SelfLiteral(), Id("d"))
+                                        ),
+                                        IntLiteral(2)
+                                    ),
+                                    ArrayCell(Id("e"),IntLiteral(0))
+                                ]),
+                            ]
+                        )
+                    ),
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 394))
+
+    def test_statement_25(self):
+        input = r"""
+        class Shape {
+            void foo(Shape s) {}
+            int main() {
+                final Shape s = Shape.CreateNew();
+                this.foo(s);
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("Shape"),
+                [
+                    MethodDecl(
+                        Instance(),
+                        Id("foo"),
+                        [VarDecl(Id("s"),ClassType(Id("Shape")))],
+                        VoidType(),
+                        Block(
+                            [],
+                            []
+                        )
+                    ),
+                    MethodDecl(
+                        Static(),
+                        Id("main"),
+                        [],
+                        VoidType(),
+                        Block(
+                            [ConstDecl(
+                                Id("s"),
+                                ClassType(Id("Shape")), 
+                                CallExpr(
+                                    Id("Shape"),
+                                    Id("CreateNew"),
+                                    []
+                                )
+                            )], 
+                            [CallStmt(SelfLiteral(),Id("foo"),[Id("s")])]
+                        )
+                    ),
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 395))
+
+    # -------------------------------------------------------------
+
+    def test_program_01(self):
+        input = r"""
+        class Shape {
+            static final int numOfShape = 0;
+            final int immuAttribute = 0;
+            float length,width;
+            
+            Shape() {
+
+            }
+
+            static int getNumOfShape() {
+                return numOfShape;
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("Shape"),
+                [   
+                    AttributeDecl(
+                        Static(),
+                        ConstDecl(
+                            Id("numOfShape"),
+                            IntType(),
+                            IntLiteral(0)
+                        )
+                    ),
+                    AttributeDecl(
+                        Instance(),
+                        ConstDecl(
+                            Id("immuAttribute"),
+                            IntType(),
+                            IntLiteral(0)
+                        )
+                    ),
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(Id("length"),FloatType())
+                    ),
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(Id("width"),FloatType())
+                    ),
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("<init>"),
+                        param=[],
+                        returnType=None,
+                        body=Block([], [])
+                    ),
+                    MethodDecl(
+                        kind=Static(),
+                        name=Id("getNumOfShape"),
+                        param=[],
+                        returnType=IntType(),
+                        body=Block([], [
+                            Return(Id("numOfShape"))
+                        ])
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 396))
+
+    def test_program_02(self):
+        input = r"""
+        class QuickSort {
+            void quickSort(int[6] arr; int low, high) {
+                if this.len(arr) == 1 then
+                    return arr;
+                if low < high then
+                    pi := this.partition(arr, low, high);
+
+                this.quickSort(arr, low, pi-1);
+                this.quickSort(arr, pi+1, high);
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("QuickSort"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("quickSort"),
+                        param=[
+                            VarDecl(
+                                Id("arr"),
+                                ArrayType(6,IntType())
+                            ),
+                            VarDecl(Id("low"),IntType()),
+                            VarDecl(Id("high"),IntType())
+                        ],
+                        returnType=VoidType(),
+                        body=Block(
+                            [], [
+                                If(
+                                    BinaryOp("==",
+                                        CallExpr(SelfLiteral(),Id("len"),[Id("arr")]),
+                                        IntLiteral(1)
+                                    ),
+                                    Return(Id("arr"))
+                                ),
+                                If(
+                                    BinaryOp("<",Id("low"),Id("high")),
+                                    Assign(
+                                        Id("pi"),
+                                        CallExpr(
+                                            SelfLiteral(),
+                                            Id("partition"),
+                                            [Id("arr"),Id("low"),Id("high")]
+                                        )
+                                    )
+                                ),
+                                CallStmt(SelfLiteral(),Id("quickSort"),[
+                                    Id("arr"),
+                                    Id("low"),
+                                    BinaryOp("-",Id("pi"),IntLiteral(1))
+                                ]),
+                                CallStmt(SelfLiteral(),Id("quickSort"),[
+                                    Id("arr"),
+                                    BinaryOp("+",Id("pi"),IntLiteral(1)),
+                                    Id("high")
+                                ])
+                            ]
+                        )
+                    ),
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 397))
+
+    def test_program_03(self):
+        input = r"""
+        class Example {
+            int factorial(int n) {
+                if n==0 then return 1; else return n * this.factorial(n - 1);
+            }
+
+            void main() {
+                int x;
+                x:=io.readInt();
+                io.writeIntLn(this.factorial(x));
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("Example"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("factorial"),
+                        param=[VarDecl(Id("n"), IntType())],
+                        returnType=IntType(),
+                        body=Block(
+                            [], [
+                                If(
+                                    BinaryOp("==",Id("n"),IntLiteral(0)),
+                                    Return(IntLiteral(1)),
+                                    Return(BinaryOp("*",
+                                        Id("n"),
+                                        CallExpr(
+                                            SelfLiteral(),
+                                            Id("factorial"),
+                                            [BinaryOp("-",Id("n"),IntLiteral(1))]
+                                        )
+                                    ))
+                                )
+                            ]
+                        )
+                    ),
+                    MethodDecl(
+                        kind=Static(),
+                        name=Id("main"),
+                        param=[],
+                        returnType=VoidType(),
+                        body=Block([
+                            VarDecl(Id("x"),IntType())
+                        ], [
+                            Assign(Id("x"),CallExpr(Id("io"),Id("readInt"),[])),
+                            CallStmt(
+                                Id("io"),
+                                Id("writeIntLn"),
+                                [CallExpr(SelfLiteral(),Id("factorial"),[Id("x")])]
+                            )
+                        ])
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 398))
+
+    def test_program_04(self):
+        input = r"""
+        class Shape {
+            float length,width;
+            float getArea() {}
+            Shape(float length,width){
+                this.length := length;
+                this.width := width;
+            }
+        }
+        class Rectangle extends Shape {
+            float getArea(){
+                return this.length*this.width;
+            }
+        }
+        class Triangle extends Shape {
+            float getArea(){
+                return this.length*this.width / 2;
+            }
+        }
+        class Example2 {
+            void main(){
+                Shape s;
+                s := new Rectangle(3,4);
+                io.writeFloatLn(s.getArea());
+                s := new Triangle(3,4);
+                io.writeFloatLn(s.getArea());
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("Shape"),
+                [
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(Id("length"),FloatType())
+                    ),
+                    AttributeDecl(
+                        Instance(),
+                        VarDecl(Id("width"),FloatType())
+                    ),
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("getArea"),
+                        param=[],
+                        returnType=FloatType(),
+                        body=Block(
+                            [],[]
+                        )
+                    ),
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("<init>"),
+                        param=[
+                            VarDecl(Id("length"),FloatType()),
+                            VarDecl(Id("width"),FloatType())
+                        ],
+                        returnType=None,
+                        body=Block(
+                            [],[
+                                Assign(
+                                    FieldAccess(SelfLiteral(),Id("length")),
+                                    Id("length")
+                                ),
+                                Assign(
+                                    FieldAccess(SelfLiteral(),Id("width")),
+                                    Id("width")
+                                )
+                            ]
+                        )
+                    ),
+                ]
+            ),
+            ClassDecl(
+                classname=Id("Rectangle"),
+                parentname=Id("Shape"),
+                memlist=[
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("getArea"),
+                        param=[],
+                        returnType=FloatType(),
+                        body=Block(
+                            [],[
+                                Return(BinaryOp(
+                                    "*",
+                                    FieldAccess(SelfLiteral(),Id("length")),
+                                    FieldAccess(SelfLiteral(),Id("width"))
+                                ))
+                            ]
+                        )
+                    )
+                ]
+            ),
+            ClassDecl(
+                classname=Id("Triangle"),
+                parentname=Id("Shape"),
+                memlist=[
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("getArea"),
+                        param=[],
+                        returnType=FloatType(),
+                        body=Block(
+                            [],[
+                                Return(BinaryOp(
+                                    "/",
+                                    BinaryOp(
+                                        "*",
+                                        FieldAccess(SelfLiteral(),Id("length")),
+                                        FieldAccess(SelfLiteral(),Id("width"))
+                                    ),
+                                    IntLiteral(2)
+                                ))
+                            ]
+                        )
+                    )
+                ]
+            ),
+            ClassDecl(
+                classname=Id("Example2"),
+                parentname=None,
+                memlist=[
+                    MethodDecl(
+                        kind=Static(),
+                        name=Id("main"),
+                        param=[],
+                        returnType=VoidType(),
+                        body=Block([
+                            VarDecl(Id("s"),ClassType(Id("Shape")))
+                        ], [
+                            Assign(Id("s"),NewExpr(Id("Rectangle"),[IntLiteral(3),IntLiteral(4)])),
+                            CallStmt(Id("io"),Id("writeFloatLn"),[CallExpr(Id("s"),Id("getArea"),[])]),
+                            Assign(Id("s"),NewExpr(Id("Triangle"),[IntLiteral(3),IntLiteral(4)])),
+                            CallStmt(Id("io"),Id("writeFloatLn"),[CallExpr(Id("s"),Id("getArea"),[])])
+                        ])
+                    )
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 399))
+
+    def test_program_05(self):
+        input = r"""
+        class QuickSort {
+            int partition(int[6] arr; int low, high)
+            {
+                int i = (low-1), pivot = arr[high];    
+            
+                for j :=low to high do
+                    if arr[j] <= pivot then
+                    { 
+                        i := i+1;
+                        arr[i] := arr[j];
+                        arr[j] :=arr[i];
+                    }
+            
+                arr[i+1] := arr[high];
+                arr[high] := arr[i+1];
+                return (i+1);
+            }
+        }
+        """
+        expect = str(Program([
+            ClassDecl(
+                Id("QuickSort"),
+                [
+                    MethodDecl(
+                        kind=Instance(),
+                        name=Id("partition"),
+                        param=[
+                            VarDecl(Id("arr"),ArrayType(6,IntType())),
+                            VarDecl(Id("low"),IntType()),
+                            VarDecl(Id("high"),IntType())
+                        ],
+                        returnType=IntType(),
+                        body=Block(
+                            [
+                                VarDecl(
+                                    Id("i"),
+                                    IntType(),
+                                    BinaryOp("-",Id("low"),IntLiteral(1))
+                                ),
+                                VarDecl(
+                                    Id("pivot"),
+                                    IntType(), 
+                                    ArrayCell(Id("arr"), Id("high"))
+                                )
+                            ], [
+                                For(Id("j"),Id("low"),Id("high"),True,
+                                    If(
+                                        BinaryOp(
+                                            "<=",
+                                            ArrayCell(Id("arr"),Id("j")),
+                                            Id("pivot")
+                                        ),
+                                        Block([],[
+                                            Assign(
+                                                Id("i"),
+                                                BinaryOp(
+                                                    "+",
+                                                    Id("i"),
+                                                    IntLiteral(1)
+                                                )
+                                            ),
+                                            Assign(
+                                                ArrayCell(Id("arr"),Id("i")),
+                                                ArrayCell(Id("arr"),Id("j"))
+                                            ),
+                                            Assign(
+                                                ArrayCell(Id("arr"),Id("j")),
+                                                ArrayCell(Id("arr"),Id("i"))
+                                            )
+                                        ])
+                                    )
+                                ),
+                                Assign(
+                                    ArrayCell(
+                                        Id("arr"),
+                                        BinaryOp(
+                                            "+",
+                                            Id("i"),
+                                            IntLiteral(1)
+                                        )
+                                    ),
+                                    ArrayCell(Id("arr"),Id("high"))
+                                ),
+                                Assign(
+                                    ArrayCell(Id("arr"), Id("high")),
+                                    ArrayCell(
+                                        Id("arr"),
+                                        BinaryOp(
+                                            "+",
+                                            Id("i"),
+                                            IntLiteral(1)
+                                        )
+                                    )
+                                ),
+                                Return(BinaryOp("+",Id("i"),IntLiteral(1)))
+                            ]                       
+                        )
+                    ),
+                ]
+            )
+        ]))
+        self.assertTrue(TestAST.test(input, expect, 300))

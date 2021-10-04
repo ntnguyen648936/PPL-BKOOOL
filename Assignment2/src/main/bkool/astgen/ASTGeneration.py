@@ -205,7 +205,7 @@ class ASTGeneration(BKOOLVisitor):
     def visitLhs(self, ctx: BKOOLParser.LhsContext):
         indexExprContext = ctx.indexExpr()
         if indexExprContext:
-            return [self.visit(indexExprContext)]
+            return self.visit(indexExprContext)
 
         termMemAccessContext = ctx.termMemAccess()
         if termMemAccessContext:

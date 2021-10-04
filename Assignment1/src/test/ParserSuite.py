@@ -161,7 +161,7 @@ r"""
 class ABC extends XYZ { 
     float n;
     static int foo() { 
-            int x = 1 + 2 * 3, y = functionA(this.n);
+            int x = 1 + 2 * 3, y = this.functionA(this.n);
     }
 }
 """
@@ -632,7 +632,7 @@ class ABC extends XYZ {
 r"""
 class ABC extends XYZ { 
     static int foo() { 
-        if a[0]==2 then if a+1==foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else
+        if a[0]==2 then if a+1==abc.foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else
             
     }
 }
@@ -646,7 +646,7 @@ r"""
 class ABC extends XYZ { 
     static int foo() {
         for i:=2 to 10 do
-        if a[0]==2 then if a+1==foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
+        if a[0]==2 then if a+1==abc.foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
             
     }
 }
@@ -660,7 +660,7 @@ r"""
 class ABC extends XYZ { 
     static int foo() {
         for i:=2 to 10 do
-        if a[0]==2 if a+1==foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
+        if a[0]==2 if a+1==abc.foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
             
     }
 }
@@ -674,7 +674,7 @@ r"""
 class ABC extends XYZ { 
     static int foo() {
         for i:=2 to 10 do
-        if a[0]==2 then a+1==foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
+        if a[0]==2 then a+1==abc.foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
             
     }
 }
@@ -688,7 +688,7 @@ r"""
 class ABC extends XYZ { 
     static int foo() {
         for i:=2 to 10 do
-        if a[0]==2 then a.1==foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
+        if a[0]==2 then a.1==this.foo(true)[a*1.3e+5] then if a then a:=1; else a:=1; else a:=1;
             
     }
 }
@@ -702,12 +702,12 @@ r"""
 class ABC extends XYZ { 
     static int foo() {
         for i:=2 to 10 do
-        if a[0]==2 then if a.a1==foo(true)[a*1.3e+5] then a==1 then a:=1; else a:=1; else a:=1;
+        if a[0]==2 then if a.a1==this.foo(true)[a*1.3e+5] then a==1 then a:=1; else a:=1; else a:=1;
             
     }
 }
 """
-        expect = "Error on line 5 col 59: =="
+        expect = "Error on line 5 col 64: =="
         self.assertTrue(TestParser.test(input,expect,256))
 
     def test_statement_07(self):
@@ -716,12 +716,12 @@ r"""
 class ABC extends XYZ { 
     static int foo() {
         for i:=2 to 10 do
-        if a[0]==2 then if a.a1==foo(true)[a*1.3e+5] then a then a:=1; else a:=1; else a:=1;
+        if a[0]==2 then if a.a1==this.foo(true)[a*1.3e+5] then a then a:=1; else a:=1; else a:=1;
             
     }
 }
 """
-        expect = "Error on line 5 col 60: then"
+        expect = "Error on line 5 col 65: then"
         self.assertTrue(TestParser.test(input,expect,257))
 
     def test_statement_08(self):
@@ -1159,7 +1159,7 @@ class Main {
     void main() {
         {{
             int a = 1;
-            a();
+            this.a();
             io.oi.abc.def().io.writeStr(s.name);
             int x = a;
         }}
@@ -1177,7 +1177,7 @@ class Main {
     void main() {
         Shape s = new Shape();
         for i:=0 to 10 do ( s ).width := 2;
-        writeStr(s.name);
+        io.writeStr(s.name);
         int a = 0;
     }
 }
@@ -1194,7 +1194,7 @@ class Main {
         Shape s = new Shape();
         for i:=0 to 10 do ( s ).width := 2;
         {
-            writeStr(s.name);
+            io.writeStr(s.name);
             int a = 0;
         }
     }
@@ -1214,7 +1214,7 @@ class Main {
         {
             {}
             {}
-            writeStr(s.name);
+            io.writeStr(s.name);
             a := 0;
         }
     }
@@ -1235,7 +1235,7 @@ class Main {
             {
                 {}
                 {}
-                writeStr(s.name);
+                io.writeStr(s.name);
                 a := 0;
                 {
                     var a = 1;
@@ -1392,7 +1392,7 @@ class Angel extends Shape {
 class Main {
     void main(){
         Shape s = new Shape(); # Shape is a Class name
-        Shape s = Shape(); # Shape is a function
+        Shape s = this.Shape(); # Shape is a function
     }
 }
 
@@ -1498,10 +1498,10 @@ class QuickSort {
     }
     
     void quickSort(int[6] arr; int low, high) {
-        if len(arr) == 1 then
+        if this.len(arr) == 1 then
             return arr;
         if low < high then
-            pi := partition(arr, low, high);
+            pi := this.partition(arr, low, high);
 
         this.quickSort(arr, low, pi-1);
         this.quickSort(arr, pi+1, high);
@@ -1546,10 +1546,10 @@ class QuickSort {
     void quickSort(int[6] arr; int low, high) {
         {
             { 
-                if len(arr) == 1 then
+                if this.len(arr) == 1 then
                     return arr;
                 if low < high then
-                    pi := partition(arr, low, high);
+                    pi := this.partition(arr, low, high);
             }
 
             this.quickSort(arr, low, pi-1);
