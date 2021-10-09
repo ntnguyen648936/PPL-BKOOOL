@@ -10,4 +10,7 @@
   + [Locks-and-keys]
 
 ## Type checking (type expression)
-- {array(1..10,record((a*array(,5..10,integer)*(b*record((c*real)*(d*array(1..3,real)))))))}
+```
+array(1..10,record((a*array(,5..10,integer)*(b*record((c*real)*(d*array(1..3,real)))))))}
+
+```
