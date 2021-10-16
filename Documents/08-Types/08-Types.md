@@ -4,7 +4,7 @@
 
 - 2 Operator: assignment and dereferencing ( j = *ptr )
 - Problems:
-  - [Dangling pointer](https://www.geeksforgeeks.org/dangling-void-null-wild-pointers/) 
+  - [Dangling pointer](https://www.geeksforgeeks.org/dangling-void-null-wild-pointers/)
   - Lost heap-dynamic variable
 - Solution for Danling pointer:
   - [Tombstone](https://en.wikipedia.org/wiki/Tombstone_(programming))
