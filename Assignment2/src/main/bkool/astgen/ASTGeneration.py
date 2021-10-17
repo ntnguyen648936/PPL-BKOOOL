@@ -327,10 +327,10 @@ class ASTGeneration(BKOOLVisitor):
             lambda term, ele: BinaryOp(
                 ele[1].getText(),
                 term,
-                ele[0].accept(self)
+                self.visit(ele[0])
             ),
             zip(ctx.term2()[1:], ctx.andorOp()),
-            ctx.term2()[0].accept(self)
+            self.visit(ctx.term2()[0])
         )
 
     def visitTerm2(self, ctx: BKOOLParser.Term2Context):
@@ -338,10 +338,10 @@ class ASTGeneration(BKOOLVisitor):
             lambda term, ele: BinaryOp(
                 ele[1].getText(),
                 term,
-                ele[0].accept(self)
+                self.visit(ele[0])
             ),
             zip(list(ctx.term3()[1:]), ctx.addOp()),
-            ctx.term3()[0].accept(self)
+            self.visit(ctx.term3()[0])
         )
 
     def visitTerm3(self, ctx: BKOOLParser.Term3Context):
@@ -349,10 +349,10 @@ class ASTGeneration(BKOOLVisitor):
             lambda term, ele: BinaryOp(
                 ele[1].getText(),
                 term,
-                ele[0].accept(self)
+                self.visit(ele[0])
             ),
             zip(ctx.term4()[1:], ctx.mulsOp()),
-            ctx.term4()[0].accept(self)
+            self.visit(ctx.term4()[0])
         )
 
     def visitTerm4(self, ctx: BKOOLParser.Term4Context):
@@ -360,10 +360,10 @@ class ASTGeneration(BKOOLVisitor):
             lambda term, ele: BinaryOp(
                 ele[1].getText(),
                 term,
-                ele[0].accept(self)
+                self.visit(ele[0])
             ),
             zip(ctx.term5()[1:], ctx.CONCAT()),
-            ctx.term5()[0].accept(self)
+            self.visit(ctx.term5()[0])
         )
 
     def visitTerm5(self, ctx: BKOOLParser.Term5Context):
