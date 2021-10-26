@@ -1,0 +1,12 @@
+{
+    "python.analysis.extraPaths": [
+        "./src/main/bkool/utils",
+        "./src/test",
+        "./target",
+        "./src/main/bkool/astgen",
+        "./src/main/bkool/parser"
+    ],
+    "cSpell.words": [
+        "mtype"
+    ]
+}
